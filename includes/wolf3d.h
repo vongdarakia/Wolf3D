@@ -10,8 +10,17 @@
 # include <math.h>
 # include <time.h>
 # include <sys/time.h>
+# include <fcntl.h>
+# include <sys/types.h>
+# include <sys/uio.h>
 # include "libft.h"
 # include "mlx.h"
+
+typedef struct s_pos_i
+{
+	int x;
+	int y;
+}				t_pos_i;
 
 typedef struct s_pos_f
 {
@@ -43,6 +52,15 @@ typedef struct s_env
 	double		cameraX;
 	t_pos_f		ray_pos;
 	t_pos_f		ray_dir;
+	t_pos_i 	map;
+	//length of ray from current position to next x or y-side
+	t_pos_f side_dist;
+	//length of ray from one x or y-side to next x or y-side
+	t_pos_i step;
+	int			line_height;
+	int			side;
+	int			hit;
+	t_pos_f		dlt_dist;
 	unsigned int **buffer;
 	int **texture;
 	struct timeval startTime;
@@ -52,6 +70,7 @@ typedef struct s_env
 	int dir_x;
 	int dir_y;
 	int color;
+	int **w_map;
 }			t_env;
 
 typedef struct	s_point
@@ -69,5 +88,7 @@ void	draw_line_yslope(t_env *e, t_point p0, t_point p1, int color);
 void	draw_line(t_env *e, t_point p0, t_point p1, int color);
 
 void	draw_buffer(t_env *e);
+
+void	read_map(t_env *e, char *filename);
 
 #endif

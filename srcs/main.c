@@ -1,190 +1,123 @@
 #include "wolf3d.h"
 
-int worldMap[mapWidth][mapHeight]=
-{
-  {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,2,2,2,2,2,0,0,0,0,3,0,3,0,3,0,0,0,1},
-  {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,3,0,0,0,3,0,0,0,1},
-  {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,2,2,0,2,2,0,0,0,0,3,0,3,0,3,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,4,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,4,0,0,0,0,5,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,4,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,4,0,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-};
+// int e->w_map[mapWidth][mapHeight]=
+// 	{
+// 	  {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+// 	  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+// 	  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+// 	  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+// 	  {1,0,0,0,0,0,2,2,2,2,2,0,0,0,0,3,0,3,0,3,0,0,0,1},
+// 	  {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1},
+// 	  {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,3,0,0,0,3,0,0,0,1},
+// 	  {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1},
+// 	  {1,0,0,0,0,0,2,2,0,2,2,0,0,0,0,3,0,3,0,3,0,0,0,1},
+// 	  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+// 	  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+// 	  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+// 	  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+// 	  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+// 	  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+// 	  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+// 	  {1,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+// 	  {1,4,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+// 	  {1,4,0,0,0,0,5,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+// 	  {1,4,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+// 	  {1,4,0,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+// 	  {1,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+// 	  {1,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+// 	  {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+// 	};
 
-typedef struct s_pos_i
-{
-	int x;
-	int y;
-}				t_pos_i;
-
-
-
-// void set_step(t_pos_f *ray_pos, t_pos_i *step, t_pos_f *side_dist, t_pos_i *map) {
-	
-
-// }
-void get_wall_pos(t_pos_f *ray_pos, t_pos_f *side_dist, t_pos_i *map, t_pos_f *ray_dir)
-{
-		// t_pos_i step;
-		// int hit = 0;
-		// int side;
-
-		// // set_step(ray_pos->x, ray_pos->y, &step, side_dist, map);
-
-		// while (hit == 0)
-		// {
-		// 	if (side_dist->x < side_dist->y)
-		// 	{
-		// 	  side_dist->x += deltaDistX;
-		// 	  map.x += step.x;
-		// 	  side = 0;
-		// 	}
-		// 	else
-		// 	{
-		// 	  side_dist->y += deltaDistY;
-		// 	  map.y += step.y;
-		// 	  side = 1;
-		// 	}
-		// 	if (worldMap[map.x][map.y] > 0)
-		// 		hit = 1;
-		// } 
-		// //Calculate distance projected on camera direction (oblique distance will give fisheye effect!)
-		// if (side == 0) perpWallDist = (map.x - ray_pos->x + (1 - step.x) / 2) / ray_dir->x;
-		// else           perpWallDist = (map.y - ray_pos->y + (1 - step.y) / 2) / ray_dir->y;
+void	cast_ray(t_env *e) {
+	e->hit = 0;
+	while (e->hit == 0)
+	{
+		if (e->side_dist.x < e->side_dist.y)
+		{
+		  e->side_dist.x += e->dlt_dist.x;
+		  e->map.x += e->step.x;
+		  e->side = 0;
+		}
+		else
+		{
+		  e->side_dist.y += e->dlt_dist.y;
+		  e->map.y += e->step.y;
+		  e->side = 1;
+		}
+		if (e->w_map[e->map.x][e->map.y] > 0)
+			e->hit = 1;
+	}
 }
+
+int		get_wall_height(t_env *e) {
+	double perpWallDist;
+
+	e->dlt_dist.x = sqrt(1 + (e->ray_dir.y * e->ray_dir.y) / (e->ray_dir.x * e->ray_dir.x));
+	e->dlt_dist.y = sqrt(1 + (e->ray_dir.x * e->ray_dir.x) / (e->ray_dir.y * e->ray_dir.y));
+	e->map.x = (int)(e->ray_pos.x);
+	e->map.y = (int)(e->ray_pos.y);
+	e->step.x = (e->ray_dir.x < 0) ? -1 : 1;
+	e->side_dist.x = (e->ray_dir.x < 0) ? (e->ray_pos.x - e->map.x) * e->dlt_dist.x : (e->map.x + 1.0 - e->ray_pos.x) * e->dlt_dist.x;
+	e->step.y = (e->ray_dir.y < 0) ? -1 : 1;
+	e->side_dist.y = (e->ray_dir.y < 0) ? (e->ray_pos.y - e->map.y) * e->dlt_dist.y : (e->map.y + 1.0 - e->ray_pos.y) * e->dlt_dist.y;
+	cast_ray(e);
+	if (e->side == 0)
+		perpWallDist = (e->map.x - e->ray_pos.x + (1 - e->step.x) / 2) / e->ray_dir.x;
+	else
+		perpWallDist = (e->map.y - e->ray_pos.y + (1 - e->step.y) / 2) / e->ray_dir.y;
+	return (int)(e->w_height/ perpWallDist);
+}
+
 void draw(t_env *e) {
-	// e->startTime = time(NULL);
-	// t_pos_f ray_dir;
+	int	draw_start;
+	int	draw_end;
 
 	gettimeofday(&e->startTime, NULL);
+	// printf("drawing %d, %d\n", e->w_width, e->w_height);
 	for(int x = 0; x < e->w_width; x++)
 	{
-		e->cameraX = 2 * x / (double)(e->w_width) - 1; //x-coordinate in camera space
-		
+		// printf("%d\n", x);
+		e->cameraX = 2 * x / (double)(e->w_width) - 1;
 		e->ray_pos.x = e->posX;
 		e->ray_pos.y = e->posY;
 		e->ray_dir.x = e->dirX + e->planeX * e->cameraX;
 		e->ray_dir.y = e->dirY + e->planeY * e->cameraX;
+		e->line_height = get_wall_height(e);
+		draw_start = -e->line_height / 2 + e->w_height/ 2;
+		if(draw_start < 0)
+			draw_start = 0;
 
-		//which box of the map we're in
-		t_pos_i map;
-		map.x = (int)(e->ray_pos.x);
-		map.y = (int)(e->ray_pos.y);
-
-		//length of ray from current position to next x or y-side
-		t_pos_f side_dist;
-
-		//length of ray from one x or y-side to next x or y-side
-		double deltaDistX = sqrt(1 + (e->ray_dir.y * e->ray_dir.y) / (e->ray_dir.x * e->ray_dir.x));
-		double deltaDistY = sqrt(1 + (e->ray_dir.x * e->ray_dir.x) / (e->ray_dir.y * e->ray_dir.y));
-		double perpWallDist;
-		t_pos_i step;
-
-		step.x = (e->ray_dir.x < 0) ? -1 : 1;
-		side_dist.x = (e->ray_dir.x < 0) ? (e->ray_pos.x - map.x) * deltaDistX : (map.x + 1.0 - e->ray_pos.x) * deltaDistX;
-		step.y = (e->ray_dir.y < 0) ? -1 : 1;
-		side_dist.y = (e->ray_dir.y < 0) ? (e->ray_pos.y - map.y) * deltaDistY : (map.y + 1.0 - e->ray_pos.y) * deltaDistY;
-
-		// get_wall_pos(&e->ray_pos, &side_dist, &map);
-		
-		int hit = 0;
-		int side;
-
-		// set_step(e->ray_pos.x, e->ray_pos.y, &step, side_dist, map);
-
-		while (hit == 0)
-		{
-			if (side_dist.x < side_dist.y)
-			{
-			  side_dist.x += deltaDistX;
-			  map.x += step.x;
-			  side = 0;
-			}
-			else
-			{
-			  side_dist.y += deltaDistY;
-			  map.y += step.y;
-			  side = 1;
-			}
-			if (worldMap[map.x][map.y] > 0)
-				hit = 1;
-		} 
-		//Calculate distance projected on camera direction (oblique distance will give fisheye effect!)
-		if (side == 0) perpWallDist = (map.x - e->ray_pos.x + (1 - step.x) / 2) / e->ray_dir.x;
-		else           perpWallDist = (map.y - e->ray_pos.y + (1 - step.y) / 2) / e->ray_dir.y;
-
-		//Calculate height of line to draw on screen
-		int lineHeight = (int)(e->w_height/ perpWallDist);
-
-		//calculate lowest and highest pixel to fill in current stripe
-		int drawStart = -lineHeight / 2 + e->w_height/ 2;
-		if(drawStart < 0)
-			drawStart = 0;
-		int drawEnd = lineHeight / 2 + e->w_height/ 2;
-		if(drawEnd >= e->w_height)
-			drawEnd = e->w_height- 1;
+		draw_end = e->line_height / 2 + e->w_height/ 2;
+		if(draw_end >= e->w_height)
+			draw_end = e->w_height- 1;
 
 		//choose wall color
-		int color;
-		switch(worldMap[map.x][map.y])
-		{
-			case 1:  color = 0xFF0000;  break; //red
-			case 2:  color = 0x00FF00;  break; //green
-			case 3:  color = 0x0000FF;   break; //blue
-			case 4:  color = 0xFFFFFF;  break; //white
-			default: color = 0xFFFF00; break; //yellow
-		}
+		// int color;
+		// switch (e->w_map[e->map.x][e->map.y])
+		// {
+		// 	case 1:  color = 0xFF0000;  break; //red
+		// 	case 2:  color = 0x00FF00;  break; //green
+		// 	case 3:  color = 0x0000FF;   break; //blue
+		// 	case 4:  color = 0xFFFFFF;  break; //white
+		// 	default: color = 0xFFFF00; break; //yellow
+		// }
 
-	  //give x and y sides different brightness
-	  // if (side == 1) {color = color / 2;}
-
-	  //draw the pixels of the stripe as a vertical line
+	  //give x and y e->sides different brightness
+	  // if (e->side == 1) {color = color / 2;}
 	  t_point start;
 	  start.x = x;
-	  start.y = drawStart;
+	  start.y = draw_start;
 
 	  t_point end;
 	  end.x = x;
-	  end.y = drawEnd;
+	  end.y = draw_end;
 
-	  // draw_line(e, start, end, texX);
-	  draw_line(e, start, end, color);
-    	// ft_printf("%d, %d, %d\n", x, drawStart, color);
+	  draw_line(e, start, end, 0xFFFFFF);
 	}
-	// draw_point_to_img(env, x, y, env->buffer[y][x]);
-	// mlx_put_image_to_window(env->mlx, env->win, env->img, 0, 0);
 
-	// for(int x = 0; x < env->w_width; x++)
- //    	for(int y = 0; y < env->w_height; y++)
- //    		draw_point_to_img(env, x, y, 0);
-	// draw_buffer(env);
-    // for(int x = 0; x < env->w_width; x++)
-    // 	for(int y = 0; y < env->w_height; y++)
-    // 		env->buffer[y][x] = 0; //clear the buffer instead of cls()
-
-	// env->endTime = time(NULL);
 	gettimeofday(&e->endTime, NULL);
 	long double frameTime = fabs((e->endTime.tv_usec - e->startTime.tv_usec) / 1000000.0);
 	printf("Time: %Lf\n", 1.0 / frameTime);
-	// printf("Time 2: %f\n", e->endTime - e->startTime);
-	//speed modifiers
     e->moveSpeed = frameTime * 50.0; //the constant value is in squares/second
     e->rotSpeed = frameTime * 30.0; //the constant value is in radians/second
 }
@@ -195,8 +128,8 @@ int	key_handler(int keycode, t_env *e)
     // W
 	if (keycode == 13 || keycode == 126)
 	{
-		if(worldMap[(int)(e->posX + e->dirX * e->moveSpeed)][(int)(e->posY)] == 0) e->posX += e->dirX * e->moveSpeed;
-		if(worldMap[(int)(e->posX)][(int)(e->posY + e->dirY * e->moveSpeed)] == 0) e->posY += e->dirY * e->moveSpeed;
+		if(e->w_map[(int)(e->posX + e->dirX * e->moveSpeed)][(int)(e->posY)] == 0) e->posX += e->dirX * e->moveSpeed;
+		if(e->w_map[(int)(e->posX)][(int)(e->posY + e->dirY * e->moveSpeed)] == 0) e->posY += e->dirY * e->moveSpeed;
 	}
 	// A
 	if (keycode == 0 || keycode == 123)
@@ -212,8 +145,8 @@ int	key_handler(int keycode, t_env *e)
 	// S
 	if (keycode == 1 || keycode == 125)
 	{
-		if(worldMap[(int)(e->posX - e->dirX * e->moveSpeed)][(int)(e->posY)] == 0) e->posX -= e->dirX * e->moveSpeed;
-      	if(worldMap[(int)(e->posX)][(int)(e->posY - e->dirY * e->moveSpeed)] == 0) e->posY -= e->dirY * e->moveSpeed;
+		if(e->w_map[(int)(e->posX - e->dirX * e->moveSpeed)][(int)(e->posY)] == 0) e->posX -= e->dirX * e->moveSpeed;
+      	if(e->w_map[(int)(e->posX)][(int)(e->posY - e->dirY * e->moveSpeed)] == 0) e->posY -= e->dirY * e->moveSpeed;
 	}
 	// D
 	if (keycode == 2 || keycode == 124)
@@ -253,8 +186,8 @@ int main(int ac, char **av)
 	// clock_gettime(CLOCK_MONOTONIC_RAW, &start);
 
 	t_env env;
-	env.w_width = screenWidth;
-	env.w_height = screenHeight;
+	// env.w_width = screenWidth;
+	// env.w_height = screenHeight;
 
 	env.mlx = mlx_init();
 	env.win = mlx_new_window(env.mlx, env.w_width, env.w_height, "Wolf3D");
@@ -271,6 +204,41 @@ int main(int ac, char **av)
 	env.planeY = 0.66;
 	env.tex_width = 64;
 	env.tex_height = 64;
+
+	if (ac > 1)
+		read_map(&env, av[1]);
+	else
+		read_map(&env, "map1.txt");
+
+	// int map[mapWidth][mapHeight]=
+	// {
+	//   {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+	//   {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+	//   {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+	//   {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+	//   {1,0,0,0,0,0,2,2,2,2,2,0,0,0,0,3,0,3,0,3,0,0,0,1},
+	//   {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1},
+	//   {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,3,0,0,0,3,0,0,0,1},
+	//   {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1},
+	//   {1,0,0,0,0,0,2,2,0,2,2,0,0,0,0,3,0,3,0,3,0,0,0,1},
+	//   {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+	//   {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+	//   {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+	//   {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+	//   {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+	//   {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+	//   {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+	//   {1,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+	//   {1,4,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+	//   {1,4,0,0,0,0,5,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+	//   {1,4,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+	//   {1,4,0,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+	//   {1,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+	//   {1,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+	//   {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+	// };
+
+	// env.e->w_map = map;
 
 
 	// unsigned int buffer[env.w_height][env.w_width]; // y-coordinate first because it works per scanline

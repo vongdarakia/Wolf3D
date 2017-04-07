@@ -20,7 +20,8 @@ CFLAGS		=	#-I includes/ #-Wall -Wextra -Werror #-fsanitize=address -I $(IDIR)
 LFLAGS		=	-I libft/includes -L libft/ -lft
 MLFLAGS		=	-I minilibx/ -L minilibx/ -lmlx -framework OpenGL -framework AppKit
 SRCS		= 	main.c \
-				draw.c
+				draw.c \
+				read.c
 
 ODIR		=	build
 OBJS		=	$(addprefix build/, $(SRCS:.c=.o)) 
