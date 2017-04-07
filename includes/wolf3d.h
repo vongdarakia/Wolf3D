@@ -13,6 +13,12 @@
 # include "libft.h"
 # include "mlx.h"
 
+typedef struct s_pos_f
+{
+	double x;
+	double y;
+}				t_pos_f;
+
 typedef struct s_env
 {
 	char *img_ptr;
@@ -34,10 +40,18 @@ typedef struct s_env
 	double		planeY;
 	double		moveSpeed;
 	double		rotSpeed;
+	double		cameraX;
+	t_pos_f		ray_pos;
+	t_pos_f		ray_dir;
 	unsigned int **buffer;
 	int **texture;
 	struct timeval startTime;
 	struct timeval endTime;
+	int px;
+	int py;
+	int dir_x;
+	int dir_y;
+	int color;
 }			t_env;
 
 typedef struct	s_point

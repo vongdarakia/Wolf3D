@@ -28,145 +28,169 @@ int worldMap[mapWidth][mapHeight]=
   {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 };
 
-typedef struct s_pos_i
+typedef struct	s_draw_env
 {
-	int x;
-	int y;
-}				t_pos_i;
+	t_point cam_pos;
+	t_point ray_pos;
+	t_point ray_dir;
+	// t_point map_pos;
+	t_point side_dist;
+	t_point dlt_dist_pos;
+	int map_x;
+	int map_y;
+	int step_x;
+	int step_y;
+	int hit;
+	int side;
+	int line_height;
+	int d_start;
+	int d_end;
+	int color;
+	double perp_wall_dist;
+}		t_draw_env;
 
+void draw(t_env *env) {
+	// env->startTime = time(NULL);
+	t_draw_env denv;
 
-
-// void set_step(t_pos_f *ray_pos, t_pos_i *step, t_pos_f *side_dist, t_pos_i *map) {
-	
-
-// }
-void get_wall_pos(t_pos_f *ray_pos, t_pos_f *side_dist, t_pos_i *map, t_pos_f *ray_dir)
-{
-		// t_pos_i step;
-		// int hit = 0;
-		// int side;
-
-		// // set_step(ray_pos->x, ray_pos->y, &step, side_dist, map);
-
-		// while (hit == 0)
-		// {
-		// 	if (side_dist->x < side_dist->y)
-		// 	{
-		// 	  side_dist->x += deltaDistX;
-		// 	  map.x += step.x;
-		// 	  side = 0;
-		// 	}
-		// 	else
-		// 	{
-		// 	  side_dist->y += deltaDistY;
-		// 	  map.y += step.y;
-		// 	  side = 1;
-		// 	}
-		// 	if (worldMap[map.x][map.y] > 0)
-		// 		hit = 1;
-		// } 
-		// //Calculate distance projected on camera direction (oblique distance will give fisheye effect!)
-		// if (side == 0) perpWallDist = (map.x - ray_pos->x + (1 - step.x) / 2) / ray_dir->x;
-		// else           perpWallDist = (map.y - ray_pos->y + (1 - step.y) / 2) / ray_dir->y;
-}
-void draw(t_env *e) {
-	// e->startTime = time(NULL);
-	// t_pos_f ray_dir;
-
-	gettimeofday(&e->startTime, NULL);
-	for(int x = 0; x < e->w_width; x++)
+	gettimeofday(&env->startTime, NULL);
+	for(int x = 0; x < env->w_width; x++)
 	{
-		e->cameraX = 2 * x / (double)(e->w_width) - 1; //x-coordinate in camera space
-		
-		e->ray_pos.x = e->posX;
-		e->ray_pos.y = e->posY;
-		e->ray_dir.x = e->dirX + e->planeX * e->cameraX;
-		e->ray_dir.y = e->dirY + e->planeY * e->cameraX;
+		// printf("yo %d\n", x);
+		denv.cam_pos.x = 2 * x / (double)(env->w_width) - 1; //x-coordinate in camera space
+		denv.ray_pos.x = env->posX;
+		denv.ray_pos.y = env->posY;
+		denv.ray_dir.x = env->dirX + env->planeX * denv.cam_pos.x;
+		denv.ray_dir.y = env->dirY + env->planeY * denv.cam_pos.x;
 
 		//which box of the map we're in
-		t_pos_i map;
-		map.x = (int)(e->ray_pos.x);
-		map.y = (int)(e->ray_pos.y);
+		denv.map_x = (int)(denv.ray_pos.x);
+		denv.map_y = (int)(denv.ray_pos.y);
 
 		//length of ray from current position to next x or y-side
-		t_pos_f side_dist;
+		// denv.side_dist.x denv.side_dist.x;
+		// denv.side_dist.y denv.side_dist.y;
 
-		//length of ray from one x or y-side to next x or y-side
-		double deltaDistX = sqrt(1 + (e->ray_dir.y * e->ray_dir.y) / (e->ray_dir.x * e->ray_dir.x));
-		double deltaDistY = sqrt(1 + (e->ray_dir.x * e->ray_dir.x) / (e->ray_dir.y * e->ray_dir.y));
-		double perpWallDist;
-		t_pos_i step;
+		//length of ray from one x or y-denv.side to next x or y-side
+		denv.dlt_dist_pos.x = sqrt(1 + (denv.ray_dir.y * denv.ray_dir.y) / (denv.ray_dir.x * denv.ray_dir.x));
+		denv.dlt_dist_pos.y = sqrt(1 + (denv.ray_dir.x * denv.ray_dir.x) / (denv.ray_dir.y * denv.ray_dir.y));
+		// double denv.perp_wall_dist;
 
-		step.x = (e->ray_dir.x < 0) ? -1 : 1;
-		side_dist.x = (e->ray_dir.x < 0) ? (e->ray_pos.x - map.x) * deltaDistX : (map.x + 1.0 - e->ray_pos.x) * deltaDistX;
-		step.y = (e->ray_dir.y < 0) ? -1 : 1;
-		side_dist.y = (e->ray_dir.y < 0) ? (e->ray_pos.y - map.y) * deltaDistY : (map.y + 1.0 - e->ray_pos.y) * deltaDistY;
+		//what direction to step in x or y-direction (either +1 or -1)
+		// int denv.step_x;
+		// int denv.step_y;
 
-		// get_wall_pos(&e->ray_pos, &side_dist, &map);
-		
-		int hit = 0;
-		int side;
 
-		// set_step(e->ray_pos.x, e->ray_pos.y, &step, side_dist, map);
+		// int denv.hit = 0; //was there a wall hit?
+		// int side; //was a NS or a EW wall hit?
 
-		while (hit == 0)
+		//calculate step and initial sideDist
+		if (denv.ray_dir.x < 0)
 		{
-			if (side_dist.x < side_dist.y)
+			denv.step_x = -1;
+			denv.side_dist.x = (denv.ray_pos.x - denv.map_x) * denv.dlt_dist_pos.x;
+		}
+		else
+		{
+			denv.step_x = 1;
+			denv.side_dist.x = (denv.map_x + 1.0 - denv.ray_pos.x) * denv.dlt_dist_pos.x;
+		}
+		if (denv.ray_dir.y < 0)
+		{
+			denv.step_y = -1;
+			denv.side_dist.y = (denv.ray_pos.y - denv.map_y) * denv.dlt_dist_pos.y;
+		}
+		else
+		{
+			denv.step_y = 1;
+			denv.side_dist.y = (denv.map_y + 1.0 - denv.ray_pos.y) * denv.dlt_dist_pos.y;
+		}
+
+		//perform DDA
+		while (denv.hit == 0)
+		{
+			//jump to next map square, OR in x-direction, OR in y-direction
+			if (denv.side_dist.x < denv.side_dist.y)
 			{
-			  side_dist.x += deltaDistX;
-			  map.x += step.x;
-			  side = 0;
+			  denv.side_dist.x += denv.dlt_dist_pos.x;
+			  denv.map_x += denv.step_x;
+			  denv.side = 0;
 			}
 			else
 			{
-			  side_dist.y += deltaDistY;
-			  map.y += step.y;
-			  side = 1;
+			  denv.side_dist.y += denv.dlt_dist_pos.y;
+			  denv.map_y += denv.step_y;
+			  denv.side = 1;
 			}
-			if (worldMap[map.x][map.y] > 0)
-				hit = 1;
+			//Check if ray has denv.hit a wall
+			if (worldMap[denv.map_x][denv.map_y] > 0) denv.hit = 1;
 		} 
+
 		//Calculate distance projected on camera direction (oblique distance will give fisheye effect!)
-		if (side == 0) perpWallDist = (map.x - e->ray_pos.x + (1 - step.x) / 2) / e->ray_dir.x;
-		else           perpWallDist = (map.y - e->ray_pos.y + (1 - step.y) / 2) / e->ray_dir.y;
+		if (denv.side == 0) denv.perp_wall_dist = (denv.map_x - denv.ray_pos.x + (1 - denv.step_x) / 2) / denv.ray_dir.x;
+		else           denv.perp_wall_dist = (denv.map_y - denv.ray_pos.y + (1 - denv.step_y) / 2) / denv.ray_dir.y;
 
 		//Calculate height of line to draw on screen
-		int lineHeight = (int)(e->w_height/ perpWallDist);
+		denv.line_height = (int)(env->w_height/ denv.perp_wall_dist);
 
 		//calculate lowest and highest pixel to fill in current stripe
-		int drawStart = -lineHeight / 2 + e->w_height/ 2;
-		if(drawStart < 0)
-			drawStart = 0;
-		int drawEnd = lineHeight / 2 + e->w_height/ 2;
-		if(drawEnd >= e->w_height)
-			drawEnd = e->w_height- 1;
+		denv.d_start = -denv.line_height / 2 + env->w_height/ 2;
+		if(denv.d_start < 0)denv.d_start = 0;
+		denv.d_end = denv.line_height / 2 + env->w_height/ 2;
+		if(denv.d_end >= env->w_height)denv.d_end = env->w_height- 1;
 
 		//choose wall color
-		int color;
-		switch(worldMap[map.x][map.y])
+		// int denv.color;
+		switch(worldMap[denv.map_x][denv.map_y])
 		{
-			case 1:  color = 0xFF0000;  break; //red
-			case 2:  color = 0x00FF00;  break; //green
-			case 3:  color = 0x0000FF;   break; //blue
-			case 4:  color = 0xFFFFFF;  break; //white
-			default: color = 0xFFFF00; break; //yellow
+			case 1:  denv.color = 0xFF0000; break; //red
+			case 2:  denv.color = 0x00FF00; break; //green
+			case 3:  denv.color = 0x0000FF; break; //blue
+			case 4:  denv.color = 0xFFFFFF; break; //white
+			default: denv.color = 0xFFFF00; break; //yellow
 		}
 
 	  //give x and y sides different brightness
-	  // if (side == 1) {color = color / 2;}
+	  if (denv.side == 1) {denv.color = denv.color / 2;}
+
+		//texturing calculations
+      // int texNum = worldMap[denv.map_x][denv.map_y] - 1; //1 subtracted from it so that texture 0 can be used!
+
+      // //calculate value of wallX
+      // double wallX; //where exactly the wall was hit
+      // if (denv.side == 0) wallX = denv.ray_pos.y + denv.perp_wall_dist * denv.ray_dir.y;
+      // else           wallX = denv.ray_pos.x + denv.perp_wall_dist * denv.ray_dir.x;
+      // wallX -= floor((wallX));
+
+      // //x coordinate on the texture
+      // int texX = (int)(wallX * (double)(env->tex_width));
+      // if(denv.side == 0 && denv.ray_dir.x > 0) texX = env->tex_width - texX - 1;
+      // if(denv.side == 1 && denv.ray_dir.y < 0) texX = env->tex_width - texX - 1;
+
+      // for(int y = denv.d_start; y<denv.d_end; y++)
+      // {
+      //   int d = y * 256 - env->tex_height * 128 + denv.line_height * 128;  //256 and 128 factors to avoid floats
+      //   int texY = ((d * env->tex_height) / denv.line_height) / 256;
+      //   unsigned int denv.color = env->texture[texNum][env->tex_height * texY + texX];
+      //   //make denv.color darker for y-sides: R, G and B byte each divided through two with a "shift" and an "and"
+      //   if(denv.side == 1) denv.color = (denv.color >> 1) & 8355711;
+      //   // env->buffer[y][x] = denv.color;
+      //   draw_point_to_img(env, x, y, denv.color);
+      // }
 
 	  //draw the pixels of the stripe as a vertical line
 	  t_point start;
 	  start.x = x;
-	  start.y = drawStart;
+	  start.y = denv.d_start;
 
 	  t_point end;
 	  end.x = x;
-	  end.y = drawEnd;
+	  end.y = denv.d_end;
 
-	  // draw_line(e, start, end, texX);
-	  draw_line(e, start, end, color);
-    	// ft_printf("%d, %d, %d\n", x, drawStart, color);
+	  // draw_line(env, start, end, texX);
+	  printf("drawing line %f, %f\n", start.x, start.y);
+	  draw_line(env, start, end, denv.color);
+    	// ft_printf("%d, %d, %d\n", x, denv.d_start, color);
 	}
 	// draw_point_to_img(env, x, y, env->buffer[y][x]);
 	// mlx_put_image_to_window(env->mlx, env->win, env->img, 0, 0);
@@ -180,13 +204,13 @@ void draw(t_env *e) {
     // 		env->buffer[y][x] = 0; //clear the buffer instead of cls()
 
 	// env->endTime = time(NULL);
-	gettimeofday(&e->endTime, NULL);
-	long double frameTime = fabs((e->endTime.tv_usec - e->startTime.tv_usec) / 1000000.0);
+	gettimeofday(&env->endTime, NULL);
+	long double frameTime = fabs((env->endTime.tv_usec - env->startTime.tv_usec) / 1000000.0);
 	printf("Time: %Lf\n", 1.0 / frameTime);
-	// printf("Time 2: %f\n", e->endTime - e->startTime);
+	// printf("Time 2: %f\n", env->endTime - env->startTime);
 	//speed modifiers
-    e->moveSpeed = frameTime * 50.0; //the constant value is in squares/second
-    e->rotSpeed = frameTime * 30.0; //the constant value is in radians/second
+    env->moveSpeed = frameTime * 50.0; //the constant value is in squares/second
+    env->rotSpeed = frameTime * 30.0; //the constant value is in radians/second
 }
 
 int	key_handler(int keycode, t_env *e)

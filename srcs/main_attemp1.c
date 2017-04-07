@@ -28,158 +28,185 @@ int worldMap[mapWidth][mapHeight]=
   {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 };
 
+typedef struct s_user_pos
+{
+	int x;
+	int y;
+	int dir_x;
+	int dir_y;
+}				t_user_pos;
+
 typedef struct s_pos_i
 {
 	int x;
 	int y;
 }				t_pos_i;
 
-
-
-// void set_step(t_pos_f *ray_pos, t_pos_i *step, t_pos_f *side_dist, t_pos_i *map) {
-	
-
-// }
-void get_wall_pos(t_pos_f *ray_pos, t_pos_f *side_dist, t_pos_i *map, t_pos_f *ray_dir)
+typedef struct s_pos_f
 {
-		// t_pos_i step;
-		// int hit = 0;
-		// int side;
+	double x;
+	double y;
+}				t_pos_f;
 
-		// // set_step(ray_pos->x, ray_pos->y, &step, side_dist, map);
-
-		// while (hit == 0)
-		// {
-		// 	if (side_dist->x < side_dist->y)
-		// 	{
-		// 	  side_dist->x += deltaDistX;
-		// 	  map.x += step.x;
-		// 	  side = 0;
-		// 	}
-		// 	else
-		// 	{
-		// 	  side_dist->y += deltaDistY;
-		// 	  map.y += step.y;
-		// 	  side = 1;
-		// 	}
-		// 	if (worldMap[map.x][map.y] > 0)
-		// 		hit = 1;
-		// } 
-		// //Calculate distance projected on camera direction (oblique distance will give fisheye effect!)
-		// if (side == 0) perpWallDist = (map.x - ray_pos->x + (1 - step.x) / 2) / ray_dir->x;
-		// else           perpWallDist = (map.y - ray_pos->y + (1 - step.y) / 2) / ray_dir->y;
+int		is_wall(int x, int y)
+{
+	return worldMap[x][y] > 0;
 }
+
+t_pos_i *get_hor_wall(t_env *e, double deg)
+{
+	t_pos_i *wall_pos;
+	t_pos_i a;
+	t_pos_i ray;
+	int ya;
+	int xa;
+
+	deg = deg < 30 ? 90 - (30 - deg) : 90 - (deg - 30);
+	a.y = floor(e->py / 64.0) * 64 + (e->dir_y > 0 ? -1 : 64);
+	a.x = e->px + (e->py - a.y) / atan(deg);
+
+	ya = (e->dir_y > 0) ? -64 : 64;
+	xa = fabs(64 / atan(deg));
+
+	ray.x = (a.x + xa);
+	ray.y = (a.y + ya);
+	printf("xa: %d, ya: %d\n", xa, ya);
+	printf("checking map[%d][%d] deg: %.2f\n\n", ray.x / 64, ray.y / 64, deg);
+	while (!is_wall(ray.x / 64, ray.y / 64)) {
+		ray.x += xa;
+		ray.y += ya;
+	}
+	wall_pos = (t_pos_i*)malloc(sizeof(t_pos_i));
+	wall_pos->x = ray.x / 64;
+	wall_pos->y = ray.y / 64;
+	return wall_pos;
+}
+
+t_pos_i *get_ver_wall(t_env *e, double deg)
+{
+	t_pos_i *wall_pos;
+	t_pos_i a;
+	t_pos_i ray;
+	int ya;
+	int xa;
+	
+	deg = deg < 30 ? 90 - (30 - deg) : 90 - (deg - 30);
+	a.x = floor(e->px / 64) * 64 + (e->dir_x > 0 ? 64 : -1);
+	a.y = e->py + (e->px - a.x) / atan(deg);
+	xa = (e->dir_x > 0) ? -64 : 64;
+	ya = 64 / atan(deg);
+	ray.x = (a.x + xa);
+	ray.y = (a.y + ya);
+
+	while (!is_wall(ray.x / 64, ray.y / 64)) {
+		ray.x += xa;
+		ray.y += ya;
+	}
+	wall_pos = (t_pos_i*)malloc(sizeof(t_pos_i));
+	wall_pos->x = ray.x / 64;
+	wall_pos->y = ray.y / 64;
+	return wall_pos;
+}
+
+double get_wall_dist() {
+
+	return 0.0;
+}
+
+void set_color_based_on_pos(t_env *e, t_pos_i *pos)
+{
+	switch(worldMap[pos->x][pos->y])
+	{
+		case 1:  e->color = 0xFF0000;  break; //red
+		case 2:  e->color = 0x00FF00;  break; //green
+		case 3:  e->color = 0x0000FF;   break; //blue
+		case 4:  e->color = 0xFFFFFF;  break; //white
+		default: e->color = 0xFFFF00; break; //yellow
+	}
+}
+
+double get_closest_dist(t_env *e, double beta, t_pos_i *w1, t_pos_i *w2) {
+	double d1;
+	double d2;
+	// double beta;
+
+	// beta = deg > 30 ? deg - 30 : 30 - deg;
+	d1 = sqrt(pow(e->px - (w1)->x, 2) + pow(e->py - (w1)->y, 2)) * acos(beta);
+	d2 = sqrt(pow(e->px - (w2)->x, 2) + pow(e->py - (w2)->y, 2)) * acos(beta);
+
+	// free(w2);
+	// free(w1);
+	if (d1 < d2)
+	{
+		set_color_based_on_pos(e, (w1));
+		return d1;
+	}
+	set_color_based_on_pos(e, (w2));
+	return d2;
+}
+
 void draw(t_env *e) {
 	// e->startTime = time(NULL);
-	// t_pos_f ray_dir;
-
 	gettimeofday(&e->startTime, NULL);
-	for(int x = 0; x < e->w_width; x++)
-	{
-		e->cameraX = 2 * x / (double)(e->w_width) - 1; //x-coordinate in camera space
-		
-		e->ray_pos.x = e->posX;
-		e->ray_pos.y = e->posY;
-		e->ray_dir.x = e->dirX + e->planeX * e->cameraX;
-		e->ray_dir.y = e->dirY + e->planeY * e->cameraX;
+	int col = -1;
+	double inc = 60.0 / 640.0;
+	double deg = 0;
+	double beta = 0;
+	double dist;
+	double slice_height;
+	int projection_dist = 277;
+	t_pos_i *w1;
+	t_pos_i *w2;
 
-		//which box of the map we're in
-		t_pos_i map;
-		map.x = (int)(e->ray_pos.x);
-		map.y = (int)(e->ray_pos.y);
+	while (++col < e->w_width) {
+		printf("col: %d\n", col);
+		printf("deg: %.2f\n", deg);
+		// beta = deg < 30 ? 90 - (30 - deg) : 90 - (deg - 30);
+		printf("beta: %.2f\n", beta);
+		// printf("%s\n", );
 
-		//length of ray from current position to next x or y-side
-		t_pos_f side_dist;
+		// ;
+		// cast ray and get distance to a wall;
+		// beta = deg > 30 ? deg - 30 : deg;
+		// beta = deg;
+		// printf("hor wall\n");
+		w1 = get_hor_wall(e, beta);
+		printf("ver wall\n");
+		w2 = get_ver_wall(e, beta);
+		printf("dist\n");
+		dist = get_closest_dist(e, beta, w1, w2);
+		printf("free\n");
+		free(w1);
+		free(w2);
+		printf("slice_height\n");
+		slice_height = ceil(64.0 / dist * projection_dist);
 
-		//length of ray from one x or y-side to next x or y-side
-		double deltaDistX = sqrt(1 + (e->ray_dir.y * e->ray_dir.y) / (e->ray_dir.x * e->ray_dir.x));
-		double deltaDistY = sqrt(1 + (e->ray_dir.x * e->ray_dir.x) / (e->ray_dir.y * e->ray_dir.y));
-		double perpWallDist;
-		t_pos_i step;
+		printf("create drawing points\n");
+		t_point start;
+		start.x = col;
+		start.y = 100 - slice_height / 2;
 
-		step.x = (e->ray_dir.x < 0) ? -1 : 1;
-		side_dist.x = (e->ray_dir.x < 0) ? (e->ray_pos.x - map.x) * deltaDistX : (map.x + 1.0 - e->ray_pos.x) * deltaDistX;
-		step.y = (e->ray_dir.y < 0) ? -1 : 1;
-		side_dist.y = (e->ray_dir.y < 0) ? (e->ray_pos.y - map.y) * deltaDistY : (map.y + 1.0 - e->ray_pos.y) * deltaDistY;
+		t_point end;
+		end.x = col;
+		end.y = 100 + slice_height / 2;
 
-		// get_wall_pos(&e->ray_pos, &side_dist, &map);
-		
-		int hit = 0;
-		int side;
-
-		// set_step(e->ray_pos.x, e->ray_pos.y, &step, side_dist, map);
-
-		while (hit == 0)
-		{
-			if (side_dist.x < side_dist.y)
-			{
-			  side_dist.x += deltaDistX;
-			  map.x += step.x;
-			  side = 0;
-			}
-			else
-			{
-			  side_dist.y += deltaDistY;
-			  map.y += step.y;
-			  side = 1;
-			}
-			if (worldMap[map.x][map.y] > 0)
-				hit = 1;
-		} 
-		//Calculate distance projected on camera direction (oblique distance will give fisheye effect!)
-		if (side == 0) perpWallDist = (map.x - e->ray_pos.x + (1 - step.x) / 2) / e->ray_dir.x;
-		else           perpWallDist = (map.y - e->ray_pos.y + (1 - step.y) / 2) / e->ray_dir.y;
-
-		//Calculate height of line to draw on screen
-		int lineHeight = (int)(e->w_height/ perpWallDist);
-
-		//calculate lowest and highest pixel to fill in current stripe
-		int drawStart = -lineHeight / 2 + e->w_height/ 2;
-		if(drawStart < 0)
-			drawStart = 0;
-		int drawEnd = lineHeight / 2 + e->w_height/ 2;
-		if(drawEnd >= e->w_height)
-			drawEnd = e->w_height- 1;
-
-		//choose wall color
-		int color;
-		switch(worldMap[map.x][map.y])
-		{
-			case 1:  color = 0xFF0000;  break; //red
-			case 2:  color = 0x00FF00;  break; //green
-			case 3:  color = 0x0000FF;   break; //blue
-			case 4:  color = 0xFFFFFF;  break; //white
-			default: color = 0xFFFF00; break; //yellow
-		}
-
-	  //give x and y sides different brightness
-	  // if (side == 1) {color = color / 2;}
-
-	  //draw the pixels of the stripe as a vertical line
-	  t_point start;
-	  start.x = x;
-	  start.y = drawStart;
-
-	  t_point end;
-	  end.x = x;
-	  end.y = drawEnd;
-
-	  // draw_line(e, start, end, texX);
-	  draw_line(e, start, end, color);
-    	// ft_printf("%d, %d, %d\n", x, drawStart, color);
+		printf("draw line\n");
+		draw_line(e, start, end, e->color);
+		deg += inc;
 	}
-	// draw_point_to_img(env, x, y, env->buffer[y][x]);
-	// mlx_put_image_to_window(env->mlx, env->win, env->img, 0, 0);
+	printf("pos: %d, %d\n", e->px, e->py);
+	// draw_point_to_img(e, x, y, e->buffer[y][x]);
+	// mlx_put_image_to_window(e->mlx, e->win, e->img, 0, 0);
 
-	// for(int x = 0; x < env->w_width; x++)
- //    	for(int y = 0; y < env->w_height; y++)
- //    		draw_point_to_img(env, x, y, 0);
-	// draw_buffer(env);
-    // for(int x = 0; x < env->w_width; x++)
-    // 	for(int y = 0; y < env->w_height; y++)
-    // 		env->buffer[y][x] = 0; //clear the buffer instead of cls()
+	// for(int x = 0; x < e->w_width; x++)
+ //    	for(int y = 0; y < e->w_height; y++)
+ //    		draw_point_to_img(e, x, y, 0);
+	// draw_buffer(e);
+    // for(int x = 0; x < e->w_width; x++)
+    // 	for(int y = 0; y < e->w_height; y++)
+    // 		e->buffer[y][x] = 0; //clear the buffer instead of cls()
 
-	// env->endTime = time(NULL);
+	// e->endTime = time(NULL);
 	gettimeofday(&e->endTime, NULL);
 	long double frameTime = fabs((e->endTime.tv_usec - e->startTime.tv_usec) / 1000000.0);
 	printf("Time: %Lf\n", 1.0 / frameTime);
@@ -195,16 +222,19 @@ int	key_handler(int keycode, t_env *e)
     // W
 	if (keycode == 13 || keycode == 126)
 	{
-		if(worldMap[(int)(e->posX + e->dirX * e->moveSpeed)][(int)(e->posY)] == 0) e->posX += e->dirX * e->moveSpeed;
-		if(worldMap[(int)(e->posX)][(int)(e->posY + e->dirY * e->moveSpeed)] == 0) e->posY += e->dirY * e->moveSpeed;
+		// printf("world: %d, %d\n", e->px + e->dir_x * e->moveSpeed, e->py);
+		if(worldMap[(int)(e->px + e->dir_x * e->moveSpeed)][(int)(e->py)] == 0)
+			e->px += e->dir_x * e->moveSpeed;
+		if(worldMap[(int)(e->px)][(int)(e->py + e->dir_y * e->moveSpeed)] == 0)
+			e->py += e->dir_y * e->moveSpeed;
 	}
 	// A
 	if (keycode == 0 || keycode == 123)
 	{
 		//both camera direction and camera plane must be rotated
-		double oldDirX = e->dirX;
-		e->dirX = e->dirX * cos(e->rotSpeed) - e->dirY * sin(e->rotSpeed);
-		e->dirY = oldDirX * sin(e->rotSpeed) + e->dirY * cos(e->rotSpeed);
+		double oldDirX = e->dir_x;
+		e->dir_x = e->dir_x * cos(e->rotSpeed) - e->dir_y * sin(e->rotSpeed);
+		e->dir_y = oldDirX * sin(e->rotSpeed) + e->dir_y * cos(e->rotSpeed);
 		double oldPlaneX = e->planeX;
 		e->planeX = e->planeX * cos(e->rotSpeed) - e->planeY * sin(e->rotSpeed);
 		e->planeY = oldPlaneX * sin(e->rotSpeed) + e->planeY * cos(e->rotSpeed);
@@ -212,16 +242,18 @@ int	key_handler(int keycode, t_env *e)
 	// S
 	if (keycode == 1 || keycode == 125)
 	{
-		if(worldMap[(int)(e->posX - e->dirX * e->moveSpeed)][(int)(e->posY)] == 0) e->posX -= e->dirX * e->moveSpeed;
-      	if(worldMap[(int)(e->posX)][(int)(e->posY - e->dirY * e->moveSpeed)] == 0) e->posY -= e->dirY * e->moveSpeed;
+		if(worldMap[(int)(e->px - e->dir_x * e->moveSpeed)][(int)(e->py)] == 0)
+			e->px -= e->dir_x * e->moveSpeed;
+      	if(worldMap[(int)(e->px)][(int)(e->py - e->dir_y * e->moveSpeed)] == 0)
+      		e->py -= e->dir_y * e->moveSpeed;
 	}
 	// D
 	if (keycode == 2 || keycode == 124)
 	{
 		//both camera direction and camera plane must be rotated
-		double oldDirX = e->dirX;
-		e->dirX = e->dirX * cos(-e->rotSpeed) - e->dirY * sin(-e->rotSpeed);
-		e->dirY = oldDirX * sin(-e->rotSpeed) + e->dirY * cos(-e->rotSpeed);
+		double oldDirX = e->dir_x;
+		e->dir_x = e->dir_x * cos(-e->rotSpeed) - e->dir_y * sin(-e->rotSpeed);
+		e->dir_y = oldDirX * sin(-e->rotSpeed) + e->dir_y * cos(-e->rotSpeed);
 		double oldPlaneX = e->planeX;
 		e->planeX = e->planeX * cos(-e->rotSpeed) - e->planeY * sin(-e->rotSpeed);
 		e->planeY = oldPlaneX * sin(-e->rotSpeed) + e->planeY * cos(-e->rotSpeed);
@@ -271,6 +303,10 @@ int main(int ac, char **av)
 	env.planeY = 0.66;
 	env.tex_width = 64;
 	env.tex_height = 64;
+	env.px = 22;
+	env.py = 12;
+	env.dir_x = -1;
+	env.dir_y = 0;
 
 
 	// unsigned int buffer[env.w_height][env.w_width]; // y-coordinate first because it works per scanline
@@ -306,7 +342,7 @@ int main(int ac, char **av)
 		env.texture[7][env.tex_width * y + x] = 128 + 256 * 128 + 65536 * 128; //flat grey texture
 	}
 
-	ft_printf("drawing");
+	ft_printf("drawing\n");
 	draw(&env);
 	mlx_put_image_to_window(env.mlx, env.win, env.img, 0, 0);
 	

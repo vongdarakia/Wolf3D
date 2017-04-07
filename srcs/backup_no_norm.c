@@ -28,122 +28,95 @@ int worldMap[mapWidth][mapHeight]=
   {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 };
 
-typedef struct s_pos_i
-{
-	int x;
-	int y;
-}				t_pos_i;
-
-
-
-// void set_step(t_pos_f *ray_pos, t_pos_i *step, t_pos_f *side_dist, t_pos_i *map) {
-	
-
-// }
-void get_wall_pos(t_pos_f *ray_pos, t_pos_f *side_dist, t_pos_i *map, t_pos_f *ray_dir)
-{
-		// t_pos_i step;
-		// int hit = 0;
-		// int side;
-
-		// // set_step(ray_pos->x, ray_pos->y, &step, side_dist, map);
-
-		// while (hit == 0)
-		// {
-		// 	if (side_dist->x < side_dist->y)
-		// 	{
-		// 	  side_dist->x += deltaDistX;
-		// 	  map.x += step.x;
-		// 	  side = 0;
-		// 	}
-		// 	else
-		// 	{
-		// 	  side_dist->y += deltaDistY;
-		// 	  map.y += step.y;
-		// 	  side = 1;
-		// 	}
-		// 	if (worldMap[map.x][map.y] > 0)
-		// 		hit = 1;
-		// } 
-		// //Calculate distance projected on camera direction (oblique distance will give fisheye effect!)
-		// if (side == 0) perpWallDist = (map.x - ray_pos->x + (1 - step.x) / 2) / ray_dir->x;
-		// else           perpWallDist = (map.y - ray_pos->y + (1 - step.y) / 2) / ray_dir->y;
-}
-void draw(t_env *e) {
-	// e->startTime = time(NULL);
-	// t_pos_f ray_dir;
-
-	gettimeofday(&e->startTime, NULL);
-	for(int x = 0; x < e->w_width; x++)
+void draw(t_env *env) {
+	// env->startTime = time(NULL);
+	gettimeofday(&env->startTime, NULL);
+	for(int x = 0; x < env->w_width; x++)
 	{
-		e->cameraX = 2 * x / (double)(e->w_width) - 1; //x-coordinate in camera space
-		
-		e->ray_pos.x = e->posX;
-		e->ray_pos.y = e->posY;
-		e->ray_dir.x = e->dirX + e->planeX * e->cameraX;
-		e->ray_dir.y = e->dirY + e->planeY * e->cameraX;
+		double cameraX = 2 * x / (double)(env->w_width) - 1; //x-coordinate in camera space
+		double rayPosX = env->posX;
+		double rayPosY = env->posY;
+		double rayDirX = env->dirX + env->planeX * cameraX;
+		double rayDirY = env->dirY + env->planeY * cameraX;
 
 		//which box of the map we're in
-		t_pos_i map;
-		map.x = (int)(e->ray_pos.x);
-		map.y = (int)(e->ray_pos.y);
+		int mapX = (int)(rayPosX);
+		int mapY = (int)(rayPosY);
 
 		//length of ray from current position to next x or y-side
-		t_pos_f side_dist;
+		double sideDistX;
+		double sideDistY;
 
 		//length of ray from one x or y-side to next x or y-side
-		double deltaDistX = sqrt(1 + (e->ray_dir.y * e->ray_dir.y) / (e->ray_dir.x * e->ray_dir.x));
-		double deltaDistY = sqrt(1 + (e->ray_dir.x * e->ray_dir.x) / (e->ray_dir.y * e->ray_dir.y));
+		double deltaDistX = sqrt(1 + (rayDirY * rayDirY) / (rayDirX * rayDirX));
+		double deltaDistY = sqrt(1 + (rayDirX * rayDirX) / (rayDirY * rayDirY));
 		double perpWallDist;
-		t_pos_i step;
 
-		step.x = (e->ray_dir.x < 0) ? -1 : 1;
-		side_dist.x = (e->ray_dir.x < 0) ? (e->ray_pos.x - map.x) * deltaDistX : (map.x + 1.0 - e->ray_pos.x) * deltaDistX;
-		step.y = (e->ray_dir.y < 0) ? -1 : 1;
-		side_dist.y = (e->ray_dir.y < 0) ? (e->ray_pos.y - map.y) * deltaDistY : (map.y + 1.0 - e->ray_pos.y) * deltaDistY;
+		//what direction to step in x or y-direction (either +1 or -1)
+		int stepX;
+		int stepY;
 
-		// get_wall_pos(&e->ray_pos, &side_dist, &map);
-		
-		int hit = 0;
-		int side;
+		int hit = 0; //was there a wall hit?
+		int side; //was a NS or a EW wall hit?
 
-		// set_step(e->ray_pos.x, e->ray_pos.y, &step, side_dist, map);
+		//calculate step and initial sideDist
+		if (rayDirX < 0)
+		{
+		stepX = -1;
+		sideDistX = (rayPosX - mapX) * deltaDistX;
+		}
+		else
+		{
+		stepX = 1;
+		sideDistX = (mapX + 1.0 - rayPosX) * deltaDistX;
+		}
+		if (rayDirY < 0)
+		{
+		stepY = -1;
+		sideDistY = (rayPosY - mapY) * deltaDistY;
+		}
+		else
+		{
+		stepY = 1;
+		sideDistY = (mapY + 1.0 - rayPosY) * deltaDistY;
+		}
 
+		//perform DDA
 		while (hit == 0)
 		{
-			if (side_dist.x < side_dist.y)
+			//jump to next map square, OR in x-direction, OR in y-direction
+			if (sideDistX < sideDistY)
 			{
-			  side_dist.x += deltaDistX;
-			  map.x += step.x;
+			  sideDistX += deltaDistX;
+			  mapX += stepX;
 			  side = 0;
 			}
 			else
 			{
-			  side_dist.y += deltaDistY;
-			  map.y += step.y;
+			  sideDistY += deltaDistY;
+			  mapY += stepY;
 			  side = 1;
 			}
-			if (worldMap[map.x][map.y] > 0)
-				hit = 1;
+			//Check if ray has hit a wall
+			if (worldMap[mapX][mapY] > 0) hit = 1;
 		} 
+
 		//Calculate distance projected on camera direction (oblique distance will give fisheye effect!)
-		if (side == 0) perpWallDist = (map.x - e->ray_pos.x + (1 - step.x) / 2) / e->ray_dir.x;
-		else           perpWallDist = (map.y - e->ray_pos.y + (1 - step.y) / 2) / e->ray_dir.y;
+		if (side == 0) perpWallDist = (mapX - rayPosX + (1 - stepX) / 2) / rayDirX;
+		else           perpWallDist = (mapY - rayPosY + (1 - stepY) / 2) / rayDirY;
 
 		//Calculate height of line to draw on screen
-		int lineHeight = (int)(e->w_height/ perpWallDist);
+		int lineHeight = (int)(env->w_height/ perpWallDist);
 
 		//calculate lowest and highest pixel to fill in current stripe
-		int drawStart = -lineHeight / 2 + e->w_height/ 2;
-		if(drawStart < 0)
-			drawStart = 0;
-		int drawEnd = lineHeight / 2 + e->w_height/ 2;
-		if(drawEnd >= e->w_height)
-			drawEnd = e->w_height- 1;
+		int drawStart = -lineHeight / 2 + env->w_height/ 2;
+		if(drawStart < 0)drawStart = 0;
+		int drawEnd = lineHeight / 2 + env->w_height/ 2;
+		if(drawEnd >= env->w_height)drawEnd = env->w_height- 1;
 
 		//choose wall color
 		int color;
-		switch(worldMap[map.x][map.y])
+		switch(worldMap[mapX][mapY])
 		{
 			case 1:  color = 0xFF0000;  break; //red
 			case 2:  color = 0x00FF00;  break; //green
@@ -153,7 +126,32 @@ void draw(t_env *e) {
 		}
 
 	  //give x and y sides different brightness
-	  // if (side == 1) {color = color / 2;}
+	  if (side == 1) {color = color / 2;}
+
+		//texturing calculations
+      // int texNum = worldMap[mapX][mapY] - 1; //1 subtracted from it so that texture 0 can be used!
+
+      // //calculate value of wallX
+      // double wallX; //where exactly the wall was hit
+      // if (side == 0) wallX = rayPosY + perpWallDist * rayDirY;
+      // else           wallX = rayPosX + perpWallDist * rayDirX;
+      // wallX -= floor((wallX));
+
+      // //x coordinate on the texture
+      // int texX = (int)(wallX * (double)(env->tex_width));
+      // if(side == 0 && rayDirX > 0) texX = env->tex_width - texX - 1;
+      // if(side == 1 && rayDirY < 0) texX = env->tex_width - texX - 1;
+
+      // for(int y = drawStart; y<drawEnd; y++)
+      // {
+      //   int d = y * 256 - env->tex_height * 128 + lineHeight * 128;  //256 and 128 factors to avoid floats
+      //   int texY = ((d * env->tex_height) / lineHeight) / 256;
+      //   unsigned int color = env->texture[texNum][env->tex_height * texY + texX];
+      //   //make color darker for y-sides: R, G and B byte each divided through two with a "shift" and an "and"
+      //   if(side == 1) color = (color >> 1) & 8355711;
+      //   // env->buffer[y][x] = color;
+      //   draw_point_to_img(env, x, y, color);
+      // }
 
 	  //draw the pixels of the stripe as a vertical line
 	  t_point start;
@@ -164,8 +162,8 @@ void draw(t_env *e) {
 	  end.x = x;
 	  end.y = drawEnd;
 
-	  // draw_line(e, start, end, texX);
-	  draw_line(e, start, end, color);
+	  // draw_line(env, start, end, texX);
+	  draw_line(env, start, end, color);
     	// ft_printf("%d, %d, %d\n", x, drawStart, color);
 	}
 	// draw_point_to_img(env, x, y, env->buffer[y][x]);
@@ -180,13 +178,13 @@ void draw(t_env *e) {
     // 		env->buffer[y][x] = 0; //clear the buffer instead of cls()
 
 	// env->endTime = time(NULL);
-	gettimeofday(&e->endTime, NULL);
-	long double frameTime = fabs((e->endTime.tv_usec - e->startTime.tv_usec) / 1000000.0);
+	gettimeofday(&env->endTime, NULL);
+	long double frameTime = fabs((env->endTime.tv_usec - env->startTime.tv_usec) / 1000000.0);
 	printf("Time: %Lf\n", 1.0 / frameTime);
-	// printf("Time 2: %f\n", e->endTime - e->startTime);
+	// printf("Time 2: %f\n", env->endTime - env->startTime);
 	//speed modifiers
-    e->moveSpeed = frameTime * 50.0; //the constant value is in squares/second
-    e->rotSpeed = frameTime * 30.0; //the constant value is in radians/second
+    env->moveSpeed = frameTime * 50.0; //the constant value is in squares/second
+    env->rotSpeed = frameTime * 30.0; //the constant value is in radians/second
 }
 
 int	key_handler(int keycode, t_env *e)

@@ -16,7 +16,7 @@ NAME		=	wolf3d
 
 IDIR		=	includes
 CC			=	gcc
-CFLAGS		=	-I includes/ #-Wall -Wextra -Werror #-fsanitize=address -I $(IDIR)
+CFLAGS		=	#-I includes/ #-Wall -Wextra -Werror #-fsanitize=address -I $(IDIR)
 LFLAGS		=	-I libft/includes -L libft/ -lft
 MLFLAGS		=	-I minilibx/ -L minilibx/ -lmlx -framework OpenGL -framework AppKit
 SRCS		= 	main.c \
