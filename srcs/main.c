@@ -186,13 +186,16 @@ int main(int ac, char **av)
 	// clock_gettime(CLOCK_MONOTONIC_RAW, &start);
 
 	t_env env;
-	// env.w_width = screenWidth;
-	// env.w_height = screenHeight;
+	env.w_width = screenWidth;
+	env.w_height = screenHeight;
+	if (ac > 1)
+		read_map(&env, av[1]);
+	else
+		read_map(&env, "map1.txt");
 
 	env.mlx = mlx_init();
 	env.win = mlx_new_window(env.mlx, env.w_width, env.w_height, "Wolf3D");
 	env.img = mlx_new_image(env.mlx, env.w_width, env.w_height);
-	
 	env.img_ptr = mlx_get_data_addr((void *)env.img, &(env.bpp),
 		&(env.line_size), &(env.endian));
 
@@ -205,10 +208,7 @@ int main(int ac, char **av)
 	env.tex_width = 64;
 	env.tex_height = 64;
 
-	if (ac > 1)
-		read_map(&env, av[1]);
-	else
-		read_map(&env, "map1.txt");
+	
 
 	// int map[mapWidth][mapHeight]=
 	// {

@@ -39,6 +39,8 @@ typedef struct s_env
 	int endian;
 	int				w_height;
 	int				w_width;
+	int				m_height;
+	int				m_width;
 	int				tex_height;
 	int				tex_width;
 	double		posX;

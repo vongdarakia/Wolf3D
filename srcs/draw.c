@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   draw.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: avongdar <vongdarakia@gmail.com>           +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2017/04/09 14:12:21 by avongdar          #+#    #+#             */
+/*   Updated: 2017/04/09 14:12:23 by avongdar         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "wolf3d.h"
 
 void	draw_point_to_img(t_env *e, int x, int y, int color)
@@ -7,7 +19,6 @@ void	draw_point_to_img(t_env *e, int x, int y, int color)
 	e->img_ptr[x++ + y] = color % 256;
 	e->img_ptr[x++ + y] = (color /= 256) % 256;
 	e->img_ptr[x + y] = (color /= 256) % 256;
-	// ft_printf("x %d, y %d\n", x, y);
 }
 
 void	draw_line_xslope(t_env *e, t_point p0, t_point p1, int color)
@@ -65,23 +76,21 @@ void	draw_line(t_env *e, t_point p0, t_point p1, int color)
 	else if (ABS(p1.y - p0.y) < ABS(p1.x - p0.x))
 		draw_line_xslope(e, p0, p1, color);
 	else
-		draw_line_yslope(e, p0, p1,color);
+		draw_line_yslope(e, p0, p1, color);
 }
 
 void	draw_buffer(t_env *e)
 {
- 	int y;
+	int	y;
+	int	x;
 
-	int x = 0;
-	
-	while (x < e->w_width)
+	x = -1;
+	while (++x < e->w_width)
 	{
-		y = 0;
-		while (y < e->w_height)
+		y = -1;
+		while (++y < e->w_height)
 		{
 			draw_point_to_img(e, x, y, e->buffer[y][x]);
-			y++;
 		}
-		x++;
 	}
 }
