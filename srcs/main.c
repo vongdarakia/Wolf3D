@@ -77,8 +77,6 @@ int	key_handler(int keycode, t_env *e)
 
 int main(int ac, char **av)
 {
-	double posX = 22;
-	double posY = 12;
 	double dirX = -1;
 	double dirY = 0;
 	double planeX = 0;
@@ -105,10 +103,8 @@ int main(int ac, char **av)
 	env.img_ptr = mlx_get_data_addr((void *)env.img, &(env.bpp),
 		&(env.line_size), &(env.endian));
 
-	env.posX = 22;
-	env.posY = 12;
-	env.ray_pos.x = env.posX;
-	env.ray_pos.y = env.posY;
+	env.ray_pos.x = 22;
+	env.ray_pos.y = 12;
 	env.dirX = -1;
 	env.dirY = 0;
 	env.planeX = 0;

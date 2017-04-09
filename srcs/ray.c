@@ -92,8 +92,8 @@ void	draw_rays(t_env *e) {
 		// 	default: color = 0xFFFF00; break; //yellow
 		// }
 
-	  //give x and y e->sides different brightness
-	  // if (e->side == 1) {color = color / 2;}
+		//give x and y e->sides different brightness
+		// if (e->side == 1) {color = color / 2;}
 		t_point start;
 		start.x = x;
 		start.y = draw_start;
