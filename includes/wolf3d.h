@@ -5,6 +5,15 @@
 # define screenWidth 640
 # define screenHeight 480
 # define ABS(x) ((x) < 0 ? -(x) : (x))
+# define W 13
+# define A 0
+# define S 1
+# define D 2
+# define UP 126
+# define LEFT 123
+# define DOWN 125
+# define RIGHT 124
+# define ESC 53
 # include <stdlib.h>
 # include <stdio.h>
 # include <math.h>
@@ -81,16 +90,13 @@ typedef struct	s_point
 	double y;
 }				t_point;
 
-void	draw_point_to_img(t_env *e, int x, int y, int color);
-
-void	draw_line_xslope(t_env *e, t_point p0, t_point p1, int color);
-
-void	draw_line_yslope(t_env *e, t_point p0, t_point p1, int color);
-
-void	draw_line(t_env *e, t_point p0, t_point p1, int color);
-
-void	draw_buffer(t_env *e);
-
 void	read_map(t_env *e, char *filename);
-
+void	draw_point_to_img(t_env *e, int x, int y, int color);
+void	draw_line_xslope(t_env *e, t_point p0, t_point p1, int color);
+void	draw_line_yslope(t_env *e, t_point p0, t_point p1, int color);
+void	draw_line(t_env *e, t_point p0, t_point p1, int color);
+void	draw_buffer(t_env *e);
+void	draw_rays(t_env *e);
+void	cast_ray(t_env *e);
+int		get_wall_height(t_env *e);
 #endif

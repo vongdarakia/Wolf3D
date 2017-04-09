@@ -21,7 +21,8 @@ LFLAGS		=	-I libft/includes -L libft/ -lft
 MLFLAGS		=	-I minilibx/ -L minilibx/ -lmlx -framework OpenGL -framework AppKit
 SRCS		= 	main.c \
 				draw.c \
-				read.c
+				read.c \
+				ray.c
 
 ODIR		=	build
 OBJS		=	$(addprefix build/, $(SRCS:.c=.o)) 
