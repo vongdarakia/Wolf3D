@@ -31,17 +31,21 @@ void	draw_line_xslope(t_env *e, t_point p0, t_point p1, int color)
 	pitch = p0.y - m * p0.x;
 	p0.x += p0.x > p1.x ? 1 : -1;
 	if (p0.x > p1.x)
-	{
-		while (--(p0.x) >= p1.x && (p.y = m * p0.x + pitch))
+		while (--(p0.x) >= p1.x)
+		{
+			p.y = m * p0.x + pitch;
 			if (p0.x < e->w_width && p0.x >= 0
 				&& p.y < e->w_height && p.y >= 0)
 				draw_point_to_img(e, p0.x, p.y, color);
-	}
+		}
 	else
-		while (++(p0.x) <= p1.x && (p.y = m * p0.x + pitch))
+		while (++(p0.x) <= p1.x)
+		{
+			p.y = m * p0.x + pitch;
 			if (p.y < e->w_width && p.y >= 0
 				&& p0.x < e->w_height && p0.x >= 0)
 				draw_point_to_img(e, p0.x, p.y, color);
+		}
 }
 
 void	draw_line_yslope(t_env *e, t_point p0, t_point p1, int color)
@@ -53,30 +57,39 @@ void	draw_line_yslope(t_env *e, t_point p0, t_point p1, int color)
 	m = (p1.x - p0.x) / (p1.y - p0.y);
 	pitch = p0.x - m * p0.y;
 	p0.y += p0.y > p1.y ? 1 : -1;
-	if (p0.y > p1.y)
-	{
-		while (--(p0.y) >= p1.y && (p.x = (m * p0.y + pitch)))
+	if (p0.y >= p1.y)
+		while (--(p0.y) >= p1.y)
+		{
+			p.x = (m * p0.y + pitch);
 			if (p0.y >= 0 && p0.y < e->w_height
 				&& p.x >= 0 && p.x < e->w_width)
 				draw_point_to_img(e, p.x, p0.y, color);
-	}
+		}
 	else
-		while (++(p0.y) <= p1.y && (p.x = (m * p0.y + pitch)))
+		while (++(p0.y) <= p1.y)
+		{
+			p.x = (m * p0.y + pitch);
 			if (p0.y >= 0 && p0.y < e->w_height
 				&& p.x >= 0 && p.x < e->w_width)
 				draw_point_to_img(e, p.x, p0.y, color);
+		}
 }
 
 void	draw_line(t_env *e, t_point p0, t_point p1, int color)
 {
+	printf("line %.2f %.2f -> %.2f %.2f\n", p0.x, p0.y, p1.x, p1.y);
 	if (p0.x == p1.x && p0.y == p1.y)
 		draw_point_to_img(e, p0.x, p0.y, color);
-	else if (p0.x == p1.x && p0.y == p1.y)
-		draw_point_to_img(e, p0.x, p0.y, color);
-	else if (ABS(p1.y - p0.y) < ABS(p1.x - p0.x))
+	else if (ABS(p1.y - p0.y) <= ABS(p1.x - p0.x))
+	{
+		printf("drawing x\n");
 		draw_line_xslope(e, p0, p1, color);
+	}
 	else
+	{
+		printf("drawing y\n");
 		draw_line_yslope(e, p0, p1, color);
+	}
 }
 
 void	draw_buffer(t_env *e)

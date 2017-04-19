@@ -37,8 +37,20 @@ typedef struct s_pos_f
 	double y;
 }				t_pos_f;
 
+typedef struct	s_point
+{
+	double x;
+	double y;
+}				t_point;
+
 typedef struct s_env
 {
+	t_point pos;
+	t_point dir;
+	t_point plane_l;
+	t_point plane_r;
+	t_point plane;
+
 	char *img_ptr;
 	void *img;
 	void *mlx;
@@ -84,11 +96,7 @@ typedef struct s_env
 	int **w_map;
 }			t_env;
 
-typedef struct	s_point
-{
-	double x;
-	double y;
-}				t_point;
+
 
 void	read_map(t_env *e, char *filename);
 void	draw_point_to_img(t_env *e, int x, int y, int color);
@@ -99,4 +107,6 @@ void	draw_buffer(t_env *e);
 void	draw_rays(t_env *e);
 void	cast_ray(t_env *e);
 int		get_wall_height(t_env *e);
+
+void	draw_minimap(t_env *e);
 #endif
