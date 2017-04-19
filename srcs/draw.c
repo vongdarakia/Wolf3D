@@ -77,17 +77,17 @@ void	draw_line_yslope(t_env *e, t_point p0, t_point p1, int color)
 
 void	draw_line(t_env *e, t_point p0, t_point p1, int color)
 {
-	printf("line %.2f %.2f -> %.2f %.2f\n", p0.x, p0.y, p1.x, p1.y);
+	// printf("line %.2f %.2f -> %.2f %.2f\n", p0.x, p0.y, p1.x, p1.y);
 	if (p0.x == p1.x && p0.y == p1.y)
 		draw_point_to_img(e, p0.x, p0.y, color);
 	else if (ABS(p1.y - p0.y) <= ABS(p1.x - p0.x))
 	{
-		printf("drawing x\n");
+		// printf("drawing x\n");
 		draw_line_xslope(e, p0, p1, color);
 	}
 	else
 	{
-		printf("drawing y\n");
+		// printf("drawing y\n");
 		draw_line_yslope(e, p0, p1, color);
 	}
 }

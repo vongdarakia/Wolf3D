@@ -34,6 +34,8 @@ void	cast_ray(t_env *e)
 	}
 }
 
+
+
 int		get_wall_height(t_env *e)
 {
 	double	wall_dist;
@@ -47,8 +49,7 @@ int		get_wall_height(t_env *e)
 	e->map.x = (int)(e->ray_pos.x);
 	e->map.y = (int)(e->ray_pos.y);
 	e->step.x = (e->ray_dir.x < 0) ? -1 : 1;
-	e->side_dist.x = (e->ray_dir.x < 0) ? (e->ray_pos.x - e->map.x)
-		* e->dlt_dist.x : (e->map.x + 1.0 - e->ray_pos.x) * e->dlt_dist.x;
+	e->side_dist.x = (e->ray_dir.x < 0) ? (e->ray_pos.x - e->map.x) * e->dlt_dist.x : (e->map.x + 1.0 - e->ray_pos.x) * e->dlt_dist.x;
 	e->step.y = (e->ray_dir.y < 0) ? -1 : 1;
 	e->side_dist.y = (e->ray_dir.y < 0) ? (e->ray_pos.y - e->map.y)
 		* e->dlt_dist.y : (e->map.y + 1.0 - e->ray_pos.y) * e->dlt_dist.y;

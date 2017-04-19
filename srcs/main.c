@@ -14,13 +14,21 @@ int	key_handler(int keycode, t_env *e)
 		e->dir.x = e->dir.x * cos(speed) - e->dir.y * sin(speed);
 		e->dir.y = old_x * sin(speed) + e->dir.y * cos(speed);
 
-		old_x = e->plane_r.x;
-		e->plane_r.x = e->plane_r.x * cos(speed) - e->plane_r.y * sin(speed);
-		e->plane_r.y = old_x * sin(speed) + e->plane_r.y * cos(speed);
 
-		old_x = e->plane_l.x;
-		e->plane_l.x = e->plane_l.x * cos(speed) - e->plane_l.y * sin(speed);
-		e->plane_l.y = old_x * sin(speed) + e->plane_l.y * cos(speed);
+		old_x = e->dirX;
+		// e->dirX = e->dirX * cos(speed) - e->dirY * sin(speed);
+		// e->dirY = old_x * sin(speed) + e->dirY * cos(speed);
+		e->dirX = (e->dir.x >= 0) ? 1 : -1;
+		e->dirY = (e->dir.y >= 0) ? 1 : -1;
+
+		// printf("dir %.2f %.2f\n", e->dirX, e->dirY);
+		// old_x = e->plane_r.x;
+		// e->plane_r.x = e->plane_r.x * cos(speed) - e->plane_r.y * sin(speed);
+		// e->plane_r.y = old_x * sin(speed) + e->plane_r.y * cos(speed);
+
+		// old_x = e->plane_l.x;
+		// e->plane_l.x = e->plane_l.x * cos(speed) - e->plane_l.y * sin(speed);
+		// e->plane_l.y = old_x * sin(speed) + e->plane_l.y * cos(speed);
 
 		old_x = e->plane.x;
 		e->plane.x = e->plane.x * cos(speed) - e->plane.y * sin(speed);
@@ -43,6 +51,14 @@ int	key_handler(int keycode, t_env *e)
 		old_x = e->plane.x;
 		e->plane.x = e->plane.x * cos(speed) - e->plane.y * sin(speed);
 		e->plane.y = old_x * sin(speed) + e->plane.y * cos(speed);
+
+		// old_x = e->dirX;
+		// e->dirX = e->dirX * cos(speed) - e->dirY * sin(speed);
+		// e->dirY = old_x * sin(speed) + e->dirY * cos(speed);
+		e->dirX = (e->dir.x >= 0) ? 1 : -1;
+		e->dirY = (e->dir.y >= 0) ? 1 : -1;
+
+		// printf("dir %.2f %.2f\n", e->dirX, e->dirY);
 	}
 	if (keycode == ESC)
 	{
@@ -68,10 +84,10 @@ int main(int ac, char **av)
 	t_env env;
 	env.w_width = screenWidth;
 	env.w_height = screenHeight;
-	// if (ac > 1)
-	// 	read_map(&env, av[1]);
-	// else
-	// 	read_map(&env, "map1.txt");
+	if (ac > 1)
+		read_map(&env, av[1]);
+	else
+		read_map(&env, "map1.txt");
 
 	env.mlx = mlx_init();
 	env.win = mlx_new_window(env.mlx, screenWidth, screenHeight, "Wolf3D");
@@ -82,8 +98,7 @@ int main(int ac, char **av)
 	printf("%d %d %d\n", env.bpp, env.line_size, env.endian);
 	env.ray_pos.x = 22;
 	env.ray_pos.y = 12;
-	env.dirX = -1;
-	env.dirY = 0;
+	
 	env.planeX = 0;
 	env.planeY = 0.66;
 	env.tex_width = 64;
@@ -92,6 +107,10 @@ int main(int ac, char **av)
 	env.pos.y = screenHeight / 2;
 	env.dir.x = 0;
 	env.dir.y = 100;
+
+	env.dirX = (env.dir.x >= 0) ? 1 : -1;
+	env.dirY = (env.dir.y >= 0) ? 1 : -1;
+
 	double fov = 60.0;
 
 	// env.plane_r.x = env.dir.x + env.pos.x + env.dir.y * tan(M_PI * fov / 360.0);

@@ -22,7 +22,8 @@ MLFLAGS		=	-I minilibx/ -L minilibx/ -lmlx -framework OpenGL -framework AppKit
 SRCS		= 	main.c \
 				draw.c \
 				read.c \
-				ray.c
+				ray.c \
+				minimap.c
 
 ODIR		=	build
 OBJS		=	$(addprefix build/, $(SRCS:.c=.o)) 
