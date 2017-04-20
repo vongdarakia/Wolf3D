@@ -11,28 +11,61 @@ double	get_side_dist(double pos, double dir, int map, double dlt_dist)
 	return (map + 1.0 - pos) * dlt_dist;
 }
 
-void	shoot_ray(t_env *e)
+void	shoot_ray(t_env *e, t_point *ray)
 {
 	e->hit = 0;
+
+	double y2 = e->dir.y * e->dir.y;
+	double x2 = e->dir.x * e->dir.x;
+	e->dlt_dist.x = sqrt(1 + (y2 / x2));
+	e->dlt_dist.y = sqrt(1 + (x2 / y2));
+
+	printf("%.2f %.2f %d %.2f\n", e->pos.x, e->dirX, e->map.y, e->dlt_dist.x);
 	e->side_dist.x = get_side_dist(e->pos.x, e->dirX, e->map.x, e->dlt_dist.x);
-	e->side_dist.y = get_side_dist(e->pos.y, e->dirX, e->map.y, e->dlt_dist.y);
-	while (e->hit == 0)
+	e->side_dist.y = get_side_dist(e->pos.y, e->dirY, e->map.y, e->dlt_dist.y);
+	// printf("side %.1f %.1f\n", e->dlt_dist.x, e->dlt_dist.y);
+	// printf("side %.1f %.1f\n", e->side_dist.x, e->side_dist.y);
+	// while (e->hit == 0 && (e->map.x < e->m_width || e->map.y < e->m_height))
+	// {
+	// 	if (e->side_dist.x < e->side_dist.y)
+	// 	{
+	// 		e->side_dist.x += e->dlt_dist.x;
+	// 		e->map.x += e->dirX;
+	// 		e->side = 0;
+	// 	}
+	// 	else
+	// 	{
+	// 		e->side_dist.y += e->dlt_dist.y;
+	// 		e->map.y += e->dirY;
+	// 		e->side = 1;
+	// 	}
+	// 	if (e->w_map[e->map.x][e->map.y] > 0)
+	// 		e->hit = 1;
+	// }
+}
+
+void	shoot_rays(t_env *e)
+{
+	double x;
+	double cam_x;
+	double screen_w;
+	t_point ray;
+
+	screen_w = (double)(screenWidth);
+	x = 0.0;
+	while (++x < screen_w)
 	{
-		if (e->side_dist.x < e->side_dist.y)
-		{
-			e->side_dist.x += e->dlt_dist.x;
-			e->map.x += e->step.x;
-			e->side = 0;
-		}
-		else
-		{
-			e->side_dist.y += e->dlt_dist.y;
-			e->map.y += e->step.y;
-			e->side = 1;
-		}
-		if (e->w_map[e->map.x][e->map.y] > 0)
-			e->hit = 1;
+		cam_x = 2 * x / screen_w - 1;
+		// printf("%.2f\n", cam_x);
+		ray.x = e->dir.x + e->plane.x * cam_x;
+		ray.y = e->dir.y + e->plane.y * cam_x;
+		shoot_ray(e, &ray);
+
+		ray.x += e->pos.x;
+		ray.y += e->pos.y;
+		draw_line(e, e->pos, ray, 0xFFFFFF);
 	}
+	
 }
 
 void	draw_map(t_env *e)
@@ -106,17 +139,19 @@ void	draw_minimap(t_env *e)
 	draw_line(e, e->pos, end, 0xFFFFFF);
 
 	draw_map(e);
+	shoot_rays(e);
 	mlx_put_image_to_window(e->mlx, e->win, e->img, 0, 0);
 
 	double y2 = e->dir.y * e->dir.y;
 	double x2 = e->dir.x * e->dir.x;
 	e->dlt_dist.x = sqrt(1 + (y2) / (x2));
 	e->dlt_dist.y = sqrt(1 + (x2) / (y2));
-	e->map.x = (int)(e->ray_pos.x);
-	e->map.y = (int)(e->ray_pos.y);
-	printf("dlt_dist x y (%.2f, %.2f)\n", e->dlt_dist.x, e->dlt_dist.y);
-	printf("dlt_dist x y (%.2f, %.2f)\n", e->dlt_dist.x, e->dlt_dist.y);
-	e->side_dist.x = get_side_dist(e->pos.x, e->dirX, e->map.x, e->dlt_dist.x);
-	e->side_dist.y = get_side_dist(e->pos.y, e->dirX, e->map.y, e->dlt_dist.y);
-	printf("side x y (%.2f, %.2f)\n", e->side_dist.x, e->side_dist.y);
+	e->map.x = (int)(e->pos.x / mapWidth);
+	e->map.y = (int)(e->pos.y / mapWidth);
+	printf("map %.2f %.2f\n", e->pos.x, e->pos.y);
+	// printf("dlt_dist x y (%.2f, %.2f)\n", e->dlt_dist.x, e->dlt_dist.y);
+	// printf("dlt_dist x y (%.2f, %.2f)\n", e->dlt_dist.x, e->dlt_dist.y);
+	// e->side_dist.x = get_side_dist(e->pos.x, e->dirX, e->map.x, e->dlt_dist.x);
+	// e->side_dist.y = get_side_dist(e->pos.y, e->dirX, e->map.y, e->dlt_dist.y);
+	// printf("side x y (%.2f, %.2f)\n", e->side_dist.x, e->side_dist.y);
 }

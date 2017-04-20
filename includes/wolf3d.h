@@ -1,7 +1,7 @@
 #ifndef WOLF3D_H
 # define WOLF3D_H
-# define mapWidth 24
-# define mapHeight 24
+# define mapWidth 20
+# define mapHeight 20
 # define screenWidth 640
 # define screenHeight 480
 # define ABS(x) ((x) < 0 ? -(x) : (x))
@@ -95,8 +95,6 @@ typedef struct s_env
 	int color;
 	int **w_map;
 }			t_env;
-
-
 
 void	read_map(t_env *e, char *filename);
 void	draw_point_to_img(t_env *e, int x, int y, int color);
