@@ -50,6 +50,7 @@ typedef struct s_env
 	t_point plane_l;
 	t_point plane_r;
 	t_point plane;
+	double dir_len;
 
 	char *img_ptr;
 	void *img;

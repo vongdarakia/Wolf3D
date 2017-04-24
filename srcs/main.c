@@ -5,7 +5,7 @@ int	key_handler(int keycode, t_env *e)
 	// printf("%d\n", keycode);
 	if (keycode == W || keycode == UP)
 	{
-		e->pos.y -= 5;
+		e->pos.y -= 0.1;
 	}
 	if (keycode == A || keycode == LEFT)
 	{
@@ -39,7 +39,7 @@ int	key_handler(int keycode, t_env *e)
 	}
 	if (keycode == S || keycode == DOWN)
 	{
-		e->pos.y += 5;
+		e->pos.y += 0.1;
 	}
 	if (keycode == D || keycode == RIGHT)
 	{
@@ -64,6 +64,7 @@ int	key_handler(int keycode, t_env *e)
 	{
 		exit(0);
 	}
+	printf("dir %.2f %.2f\n", e->dir.x, e->dir.y);
 	// printf("keycode %d\n", keycode);
 	mlx_destroy_image(e->mlx, e->img);
 	e->img = mlx_new_image(e->mlx, e->w_width, e->w_height);
@@ -99,14 +100,15 @@ int main(int ac, char **av)
 	env.ray_pos.x = 22;
 	env.ray_pos.y = 12;
 	
+	env.dir_len = 100;
 	env.planeX = 0;
 	env.planeY = 0.66;
 	env.tex_width = 64;
 	env.tex_height = 64;
-	env.pos.x = screenWidth / 2;
-	env.pos.y = screenHeight / 2;
+	env.pos.x = 14;
+	env.pos.y = 11;
 	env.dir.x = 0;
-	env.dir.y = 100;
+	env.dir.y = -1;
 
 	env.dirX = (env.dir.x >= 0) ? 1 : -1;
 	env.dirY = (env.dir.y >= 0) ? 1 : -1;
