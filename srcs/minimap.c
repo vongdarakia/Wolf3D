@@ -9,7 +9,7 @@ double	get_side_dist(double pos, double dir, int map, double dlt_dist)
 	{
 		return (pos - map) * dlt_dist;
 	}
-	return (map + 1.0 - pos) * dlt_dist;
+	return (map - pos + 1.0) * dlt_dist;
 }
 
 void	shoot_ray(t_env *e, t_point *ray)
@@ -27,6 +27,13 @@ void	shoot_ray(t_env *e, t_point *ray)
 
 	e->side_dist.x = get_side_dist(e->pos.x, ray->x, e->map.x, e->dlt_dist.x);
 	e->side_dist.y = get_side_dist(e->pos.y, ray->y, e->map.y, e->dlt_dist.y);
+	// e->side_dist.x = (ray->x < 0) ? (e->pos.x - e->map.x) * e->dlt_dist.x : (e->map.x + 1.0 - e->pos.x) * e->dlt_dist.x;
+	// e->side_dist.y = (ray->y < 0) ? (e->pos.y - e->map.y)
+	// 	* e->dlt_dist.y : (e->map.y + 1.0 - e->pos.y) * e->dlt_dist.y;
+	
+	t_pos_f side_dist;
+	side_dist.x = 0.0;
+	side_dist.y = 0.0;
 	// double dist = sqrt(y2 + x2);
 	// if (e->map.x * mapWidth - e->pos.x == 0) {
 		
@@ -42,12 +49,21 @@ void	shoot_ray(t_env *e, t_point *ray)
 	// printf("dist %.1f\n", dist);
 	// printf("dlt %.1f %.1f\n", e->dlt_dist.x, e->dlt_dist.y); 
 	// printf("pos %.1f %.1f\n", e->pos.x, e->pos.y);
-	printf("map %d %d\n", e->map.x, e->map.y);
+	// printf("map %d %d\n", e->map.x, e->map.y);
 	// printf("side x (%.1f) / %.1f = %.1f * %.1f = %.f\n", (e->map.x * mapWidth - e->pos.x), ray->x, dist, (e->map.x * mapWidth - e->pos.x) / ray->x, e->side_dist.x);
 	// printf("side y (%.1f) / %.1f = %.1f\n", (e->map.y * mapWidth - e->pos.y), ray->y, e->side_dist.y);
-	printf("side %.1f %.1f\n", e->side_dist.x, e->side_dist.y);
+	// printf("side %.1f %.1f\n", e->side_dist.x, e->side_dist.y);
+
+	// int stepX = e->dirX > 0 ? 1 : -1;
+	// int stepY = e->dirY > 0 ? 1 : -1;
+	// if (e->hit == 0 && (e->map.x < e->m_width || e->map.y < e->m_height))
+	// 	e->side_dist += 
 	while (e->hit == 0 && (e->map.x < e->m_width || e->map.y < e->m_height))
 	{
+		if (e->w_map[e->map.y][e->map.x] > 0) {
+			e->hit = 1;
+			break;
+		}
 		if (e->side_dist.x < e->side_dist.y)
 		{
 			e->side_dist.x += e->dlt_dist.x;
@@ -60,10 +76,27 @@ void	shoot_ray(t_env *e, t_point *ray)
 			e->map.y += e->dirY;
 			e->side = 1;
 		}
-		if (e->w_map[e->map.x][e->map.y] > 0)
-			e->hit = 1;
 	}
-	printf("hit at %d %d\n", e->map.x, e->map.y);
+
+	double proportion = 1;
+	printf("dist %.1f, %.1f\n", e->side_dist.x, e->side_dist.y);
+	printf("dlt %.1f %.1f\n", e->dlt_dist.x, e->dlt_dist.y);
+	if (e->side_dist.x < e->side_dist.y)
+	{
+		// e->side_dist.x -= e->dlt_dist.x;
+		proportion = e->side_dist.x / e->dlt_dist.x;
+		// printf("x proportion %.1f\n", proportion);
+		ray->y = fabs(ray->y / ray->x) * proportion * e->dirY;
+		ray->x = proportion * e->dirX;
+	}
+	else {
+		// e->side_dist.y -= e->dlt_dist.y;
+		proportion = e->side_dist.y / e->dlt_dist.y;
+		ray->x = fabs(ray->x / ray->y) * proportion * e->dirX;
+		ray->y = proportion * e->dirY;
+	}
+	printf("ray %.1f %.1f\n", ray->y, ray->x);
+	
 	// if (e->map.x == e->m_width)
 	// 	e->map.x -= 1;
 	// if (e->map.y == e->m_height)
@@ -88,21 +121,32 @@ void	shoot_rays(t_env *e)
 	while (++x < screen_w)
 	{
 		cam_x = 2 * x / screen_w - 1;
+		// cam_x = 0;
 		// printf("%.2f\n", e->plane.x);
 		ray.x = (e->dir.x + e->plane.x * cam_x);
 		ray.y = (e->dir.y + e->plane.y * cam_x);
 		e->map.x = (int) (e->pos.x);
 		e->map.y = (int) (e->pos.y);
 		shoot_ray(e, &ray);
-
+		// printf("cam %.4f\n", cam_x);
+		// if ((int)x == 1 || (int)x == screen_w - 1)
+			printf("hit at (%d %d) %.0f\n", e->map.y, e->map.x, x);
 		// ray.x = ray.x * e->dir_len + start.x;
 		// ray.y = ray.y * e->dir_len + start.y;
-		ray.x += (e->map.x - 1) * mapWidth;
-		ray.y += (e->map.y + 1) * mapHeight;
+		// ray.x *= cam_x < 0 ? -1 : 1;
+		// ray.y *= cam_x < 0 ? -1 : 1;
+		ray.x += e->pos.x;
+		ray.y += e->pos.y;
+		// ray.x += e->map.x;
+		// ray.y += e->map.y;
+		ray.x *= mapWidth;
+		ray.y *= mapHeight;
+		// ray.x -= mapWidth * e->dirX;
+		// ray.y -= mapHeight * e->dirY;
 		// ray.x = e->map.x + e->plane.x * cam_x;
 		// ray.y = e->map.y + e->plane.y * cam_x;
 		// printf("ray %.2f, %2.f\n", ray.x, ray.y);
-		draw_line(e, start, ray, 0xFFFFFF);
+		draw_line(e, start, ray, 0xFF0000);
 	}
 	
 }
@@ -165,19 +209,19 @@ void	draw_minimap(t_env *e)
 	plane.x = (e->dir.x + e->plane.x) * e->dir_len + e->pos.x * mapWidth;
 	plane.y = (e->dir.y + e->plane.y) * e->dir_len + e->pos.y * mapHeight;
 
-	printf("plane %.1f %.1f\n", plane.x, plane.y);
-	draw_line(e, end, plane, 0xFFFFFF);
-	draw_line(e, start, plane, 0xFFFFFF);
+	// printf("plane %.1f %.1f\n", plane.x, plane.y);
+	// draw_line(e, end, plane, 0xFFFFFF);
+	draw_line(e, start, plane, 0xFF00FF);
 
 	plane.x = (e->dir.x - e->plane.x) * e->dir_len + e->pos.x * mapWidth;
 	plane.y = (e->dir.y - e->plane.y) * e->dir_len + e->pos.y * mapHeight;
 
-	draw_line(e, end, plane, 0xFFFFFF);
-	draw_line(e, start, plane, 0xFFFFFF);
+	// draw_line(e, end, plane, 0xFFFFFF);
+	draw_line(e, start, plane, 0xFF00FF);
 
 
 
-	draw_line(e, start, end, 0xFFFFFF);
+	// draw_line(e, start, end, 0xFFFFFF);
 
 	
 
@@ -191,8 +235,8 @@ void	draw_minimap(t_env *e)
 
 	draw_map(e);
 	shoot_rays(e);
-	printf("map %.2f %.2f\n", e->pos.x, e->pos.y);
-	printf("map %.2f / %d = %.2f == %d\n", e->pos.y, mapWidth, e->pos.y, e->map.y);
+	// printf("map %.2f %.2f\n", e->pos.x, e->pos.y);
+	// printf("map %.2f / %d = %.2f == %d\n", e->pos.y, mapWidth, e->pos.y, e->map.y);
 	mlx_put_image_to_window(e->mlx, e->win, e->img, 0, 0);
 
 	// printf("dlt_dist x y (%.2f, %.2f)\n", e->dlt_dist.x, e->dlt_dist.y);
