@@ -10,20 +10,27 @@
 #                                                                              #
 # **************************************************************************** #
 
-LIB			=	libft/libft.a
-MLX			=	minilibx/libmlx.a
 NAME		=	wolf3d
+LIB			=	lib/libft/libft.a
+PFLIB		=	lib/ft_printf/ft_printf.a
+MLX			=	minilibx/libmlx.a
 
-IDIR		=	includes
 CC			=	gcc
-CFLAGS		=	#-I includes/ #-Wall -Wextra -Werror #-fsanitize=address -I $(IDIR)
-LFLAGS		=	-I libft/includes -L libft/ -lft
+INC			=	-I includes
+LIBINC		=	-I lib/libft/includes
+PFINC		=	-I lib/ft_printf/includes
+CFLAGS		=	#-I includes/ #-Wall -Wextra -Werror #-fsanitize=address $(IDIR)
+LFLAGS		=	lib/ft_printf/ft_printf.a
+LFLAGS		+=	lib/libft/libft.a
 MLFLAGS		=	-I minilibx/ -L minilibx/ -lmlx -framework OpenGL -framework AppKit
 SRCS		= 	main.c \
 				draw.c \
 				read.c \
 				ray.c \
-				minimap.c
+				minimap.c \
+				key_handler.c \
+				point.c \
+				get_next_line.c
 
 ODIR		=	build
 OBJS		=	$(addprefix build/, $(SRCS:.c=.o)) 
@@ -35,14 +42,17 @@ all: $(NAME)
 build:
 	@mkdir build/
 
-$(NAME): $(OBJS) $(LIB) $(MLX)
+$(NAME): $(OBJS) $(LIB) $(PFLIB) $(MLX)
 	$(CC) $(CFLAGS) $(OBJS) $(LFLAGS) $(MLFLAGS) -o $(NAME)
 
 build/%.o: srcs/%.c | build
-	$(CC) -I includes/ -I libft/includes -I minilibx/ $(CFLAGS) -c $< -o $@
+	$(CC) $(INC) $(LIBINC) -I minilibx/ $(CFLAGS) -c $< -o $@
 
 $(LIB):
-	make re -C libft/
+	make re -C lib/libft/
+
+$(PFLIB):
+	make re -C lib/ft_printf/
 
 $(MLX):
 	make re -C minilibx/
@@ -53,7 +63,8 @@ clean:
 
 fclean: clean
 	rm -f $(NAME)
-	make fclean -C libft/
+	make fclean -C lib/ft_printf/
+	make fclean -C lib/libft/
 	make clean -C minilibx/
 
 re: fclean all

@@ -1,144 +1,79 @@
 #include "wolf3d.h"
 
-int	key_handler(int keycode, t_env *e)
+t_env init_env(int ac, char **av)
 {
-	// printf("%d\n", keycode);
-	if (keycode == W || keycode == UP)
-	{
-		e->pos.y -= 0.1;
-	}
-	if (keycode == A || keycode == LEFT)
-	{
-		double old_x = e->dir.x;
-		double speed = -0.1;
-		e->dir.x = e->dir.x * cos(speed) - e->dir.y * sin(speed);
-		e->dir.y = old_x * sin(speed) + e->dir.y * cos(speed);
-
-
-		old_x = e->dirX;
-		// e->dirX = e->dirX * cos(speed) - e->dirY * sin(speed);
-		// e->dirY = old_x * sin(speed) + e->dirY * cos(speed);
-		e->dirX = (e->dir.x >= 0) ? 1 : -1;
-		e->dirY = (e->dir.y >= 0) ? 1 : -1;
-
-		// printf("dir %.2f %.2f\n", e->dirX, e->dirY);
-		// old_x = e->plane_r.x;
-		// e->plane_r.x = e->plane_r.x * cos(speed) - e->plane_r.y * sin(speed);
-		// e->plane_r.y = old_x * sin(speed) + e->plane_r.y * cos(speed);
-
-		// old_x = e->plane_l.x;
-		// e->plane_l.x = e->plane_l.x * cos(speed) - e->plane_l.y * sin(speed);
-		// e->plane_l.y = old_x * sin(speed) + e->plane_l.y * cos(speed);
-
-		old_x = e->plane.x;
-		e->plane.x = e->plane.x * cos(speed) - e->plane.y * sin(speed);
-		e->plane.y = old_x * sin(speed) + e->plane.y * cos(speed);
-		// double oldPlaneX = e->planeX;
-		// e->planeX = e->planeX * cos(e->rotSpeed) - e->planeY * sin(e->rotSpeed);
-		// e->planeY = oldPlaneX * sin(e->rotSpeed) + e->planeY * cos(e->rotSpeed);
-	}
-	if (keycode == S || keycode == DOWN)
-	{
-		e->pos.y += 0.1;
-	}
-	if (keycode == D || keycode == RIGHT)
-	{
-		double old_x = e->dir.x;
-		double speed = 0.1;
-		e->dir.x = e->dir.x * cos(speed) - e->dir.y * sin(speed);
-		e->dir.y = old_x * sin(speed) + e->dir.y * cos(speed);
-
-		old_x = e->plane.x;
-		e->plane.x = e->plane.x * cos(speed) - e->plane.y * sin(speed);
-		e->plane.y = old_x * sin(speed) + e->plane.y * cos(speed);
-
-		// old_x = e->dirX;
-		// e->dirX = e->dirX * cos(speed) - e->dirY * sin(speed);
-		// e->dirY = old_x * sin(speed) + e->dirY * cos(speed);
-		e->dirX = (e->dir.x >= 0) ? 1 : -1;
-		e->dirY = (e->dir.y >= 0) ? 1 : -1;
-
-		// printf("dir %.2f %.2f\n", e->dirX, e->dirY);
-	}
-	if (keycode == ESC)
-	{
-		exit(0);
-	}
-	printf("dir %.2f %.2f\n", e->dir.x, e->dir.y);
-	// printf("keycode %d\n", keycode);
-	mlx_destroy_image(e->mlx, e->img);
-	e->img = mlx_new_image(e->mlx, e->w_width, e->w_height);
-
-	draw_minimap(e);
-
-	// mlx_put_image_to_window(e->mlx, e->win, e->img, 0, 0);
-	return 0;
-}
-
-int main(int ac, char **av)
-{
-	double dirX = -1;
-	double dirY = 0;
-	double planeX = 0;
-	double planeY = 0.66;
-
 	t_env env;
+
 	env.w_width = screenWidth;
 	env.w_height = screenHeight;
 	if (ac > 1)
 		read_map(&env, av[1]);
 	else
 		read_map(&env, "map1.txt");
-
 	env.mlx = mlx_init();
-	env.win = mlx_new_window(env.mlx, screenWidth, screenHeight, "Wolf3D");
-	env.img = mlx_new_image(env.mlx, screenWidth, screenHeight);
+	env.win = mlx_new_window(env.mlx, env.w_width, env.w_height, "Wolf3D");
+	env.img = mlx_new_image(env.mlx, env.w_width, env.w_height);
 	env.img_ptr = mlx_get_data_addr((void *)env.img, &(env.bpp),
 		&(env.line_size), &(env.endian));
-
-	printf("%d %d %d\n", env.bpp, env.line_size, env.endian);
 	env.ray_pos.x = 22;
 	env.ray_pos.y = 12;
-	
-	env.dir_len = 100;
-	env.planeX = 0;
-	env.planeY = 0.66;
+	env.dir.x = -1;
+	env.dir.y = 0;
+	env.plane.x = 0;
+	env.plane.y = 0.66;
 	env.tex_width = 64;
 	env.tex_height = 64;
-	env.pos.x = 14;
-	env.pos.y = 11;
-	env.dir.x = 0;
-	env.dir.y = -1;
+	// env.move_spd = 0;
+	env.move_spd = 0.1;
+	env.rot_spd = 0.05;
+	env.prev_time = clock();
+	ft_bzero(env.keys, NUM_KEYS);
+	return (env);
+}
 
-	env.dirX = (env.dir.x >= 0) ? 1 : -1;
-	env.dirY = (env.dir.y >= 0) ? 1 : -1;
+int main(int ac, char **av)
+{
+	t_env env;
 
-	double fov = 60.0;
+	env = init_env(ac, av);
 
-	// env.plane_r.x = env.dir.x + env.pos.x + env.dir.y * tan(M_PI * fov / 360.0);
-	// env.plane_r.y = env.dir.y + env.pos.y;
+	// generate some textures
+	// printf("textures\n");
+	env.buffer = (unsigned int**)malloc(sizeof(int*) * screenHeight);
+	for (int i = 0; i < screenHeight; i++) {
+		env.buffer[i] = (unsigned int*)malloc(sizeof(int) * screenWidth);
+	}
 
-	// env.plane_l.x = env.dir.x + env.pos.x - env.dir.y * tan(M_PI * fov / 360.0);
-	// env.plane_l.y = env.plane_r.y;
+	env.texture = (int**)malloc(sizeof(int*) * 8);
+	for(int i = 0; i < 8; i++) {
+		env.texture[i] = (int*)malloc(sizeof(int) * (env.tex_width * env.tex_height ));
+	}
+	for(int x = 0; x < env.tex_width; x++)
+	for(int y = 0; y < env.tex_height; y++)
+	{
+		int xorcolor = (x * 256 / env.tex_width) ^ (y * 256 / env.tex_height);
+		//int xcolor = x * 256 / env.tex_width;
+		int ycolor = y * 256 / env.tex_height;
+		int xycolor = y * 128 / env.tex_height + x * 128 / env.tex_width;
+		env.texture[0][env.tex_width * y + x] = 65536 * 254 * (x != y && x != env.tex_width - y); //flat red texture with black cross
+		env.texture[1][env.tex_width * y + x] = xycolor + 256 * xycolor + 65536 * xycolor; //sloped greyscale
+		env.texture[2][env.tex_width * y + x] = 256 * xycolor + 65536 * xycolor; //sloped yellow gradient
+		env.texture[3][env.tex_width * y + x] = xorcolor + 256 * xorcolor + 65536 * xorcolor; //xor greyscale
+		env.texture[4][env.tex_width * y + x] = 256 * xorcolor; //xor green
+		env.texture[5][env.tex_width * y + x] = 65536 * 192 * (x % 16 && y % 16); //red bricks
+		env.texture[6][env.tex_width * y + x] = 65536 * ycolor; //red gradient
+		env.texture[7][env.tex_width * y + x] = 128 + 256 * 128 + 65536 * 128; //flat grey texture
+	}
 
-	env.plane.x = env.dir.y * tan(M_PI * fov / 360.0);
-	env.plane.y = 0;
-
-	printf("plane %.2f %.2f\n", env.plane_r.x, env.plane_r.y);
-	draw_minimap(&env);
-	// t_point start;
-	// start.x = 50;
-	// start.y = 50;
-	t_point end;
-	end.x = env.pos.x + env.dir.x;
-	end.y = env.pos.y + env.dir.y;
-	printf("%.2f %.2f\n", end.x, end.y);
-	draw_line(&env, env.pos, end, 0xFFFFFF);
+	ft_printf("drawing\n");
+	draw_rays(&env);
 	mlx_put_image_to_window(env.mlx, env.win, env.img, 0, 0);
-	mlx_hook(env.win, 2, 1, key_handler, &env);
+
+	// mlx_do_key_autorepeatoff(env.mlx);
+	mlx_hook(env.win, 3, 1, key_released, &env);
+	mlx_hook(env.win, 2, 1, key_pressed, &env);
+	// mlx_key_hook(env.win, key_hook, &env);
+	mlx_loop_hook(env.mlx, loop_hook, &env);
 	mlx_loop(env.mlx);
-	
-	ac = 0;
-	av = 0;
 	return (0);
 }
