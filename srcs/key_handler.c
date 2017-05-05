@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   key_handler.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: avongdar <vongdarakia@gmail.com>           +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2017/05/04 17:56:58 by avongdar          #+#    #+#             */
+/*   Updated: 2017/05/04 17:56:59 by avongdar         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "wolf3d.h"
 
 /*
@@ -52,13 +64,6 @@ int		key_released(int keycode, t_env *e)
 
 int		loop_hook(t_env *e)
 {
-	// clock_t	end = clock();
-	// frame_time = ((double)(end - e->));
-	// double frame_time = fabs((double)(e->prev_time - end) / CLOCKS_PER_SEC);
-	// printf("frame_time: %f\n", frame_time);
-	// e->prev_time = end;
-	// e->move_spd = frame_time * 20.0;
-	// e->rot_spd = frame_time * 15.0;
 	if (e->keys[KEY_W] || e->keys[KEY_UP])
 		move_straight(e, e->move_spd);
 	if (e->keys[KEY_A] || e->keys[KEY_LEFT])
@@ -73,8 +78,6 @@ int		loop_hook(t_env *e)
 	{
 		mlx_destroy_image(e->mlx, e->img);
 		e->img = mlx_new_image(e->mlx, e->w_width, e->w_height);
-		// draw_rays_with_fps(e);
-		// draw_minimap(e);
 		draw_rays(e);
 	}
 	return (0);

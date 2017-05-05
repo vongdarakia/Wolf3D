@@ -60,14 +60,6 @@ void	set_wall_height(t_env *e)
 
 void	set_texture(t_env *e)
 {
-	// e->tex_num = 0;
-	// if (e->w_map[e->map.x][e->map.y] > 0)
-	// {
-	// 	if (e->side == SIDE_Y)
-	// 		e->tex_num = (e->ray_dir.y > 0 ? 1 : 2);
-	// 	else
-	// 		e->tex_num = (e->ray_dir.x > 0 ? 3 : 4);
-	// }
 	e->tex_num = e->w_map[e->map.x][e->map.y] - 1;
 	if (e->side == 0)
 		e->wall_x = e->ray_pos.y + e->wall_dist * e->ray_dir.y;
@@ -75,9 +67,9 @@ void	set_texture(t_env *e)
 		e->wall_x = e->ray_pos.x + e->wall_dist * e->ray_dir.x;
 	e->wall_x -= floor(e->wall_x);
 	e->tex.x = (int)(e->wall_x * (double)(e->tex_width));
-	if(e->side == 0 && e->ray_dir.x > 0)
+	if (e->side == 0 && e->ray_dir.x > 0)
 		e->tex.x = e->tex_width - e->tex.x - 1;
-	if(e->side == 1 && e->ray_dir.y < 0)
+	if (e->side == 1 && e->ray_dir.y < 0)
 		e->tex.x = e->tex_width - e->tex.x - 1;
 }
 
@@ -90,7 +82,7 @@ void	draw_texture(t_env *e)
 		e->d = e->y * 256 - e->w_height * 128 + e->line_height * 128;
 		e->tex.y = ((e->d * e->tex_height) / e->line_height) / 256;
 		e->color = e->texture[e->tex_num][e->tex_height * e->tex.y + e->tex.x];
-		if(e->side == 1)
+		if (e->side == 1)
 			e->color = (e->color >> 1) & 8355711;
 		e->buffer[e->y][e->x] = e->color;
 		draw_point_to_img(e, e->x, e->y, e->color);
@@ -114,7 +106,6 @@ void	draw_rays(t_env *e)
 		if (e->draw_end >= e->w_height)
 			e->draw_end = e->w_height - 1;
 		draw_texture(e);
-		// draw_line(e, point(x, e->draw_start), point(x, e->draw_end), get_color(e));
 	}
 	mlx_put_image_to_window(e->mlx, e->win, e->img, 0, 0);
 }
