@@ -34,16 +34,16 @@ void	draw_line_xslope(t_env *e, t_point p0, t_point p1, int color)
 		while (--(p0.x) >= p1.x)
 		{
 			p.y = m * p0.x + pitch;
-			if (p0.x < e->w_width && p0.x >= 0
-				&& p.y < e->w_height && p.y >= 0)
+			if (p0.x < WIN_WIDTH && p0.x >= 0
+				&& p.y < WIN_HEIGHT && p.y >= 0)
 				draw_point_to_img(e, p0.x, p.y, color);
 		}
 	else
 		while (++(p0.x) <= p1.x)
 		{
 			p.y = m * p0.x + pitch;
-			if (p.y < e->w_width && p.y >= 0
-				&& p0.x < e->w_height && p0.x >= 0)
+			if (p.y < WIN_WIDTH && p.y >= 0
+				&& p0.x < WIN_HEIGHT && p0.x >= 0)
 				draw_point_to_img(e, p0.x, p.y, color);
 		}
 }
@@ -61,16 +61,16 @@ void	draw_line_yslope(t_env *e, t_point p0, t_point p1, int color)
 		while (--(p0.y) >= p1.y)
 		{
 			p.x = (m * p0.y + pitch);
-			if (p0.y >= 0 && p0.y < e->w_height
-				&& p.x >= 0 && p.x < e->w_width)
+			if (p0.y >= 0 && p0.y < WIN_HEIGHT
+				&& p.x >= 0 && p.x < WIN_WIDTH)
 				draw_point_to_img(e, p.x, p0.y, color);
 		}
 	else
 		while (++(p0.y) <= p1.y)
 		{
 			p.x = (m * p0.y + pitch);
-			if (p0.y >= 0 && p0.y < e->w_height
-				&& p.x >= 0 && p.x < e->w_width)
+			if (p0.y >= 0 && p0.y < WIN_HEIGHT
+				&& p.x >= 0 && p.x < WIN_WIDTH)
 				draw_point_to_img(e, p.x, p0.y, color);
 		}
 }
@@ -91,10 +91,10 @@ void	draw_buffer(t_env *e)
 	int	x;
 
 	x = -1;
-	while (++x < e->w_width)
+	while (++x < WIN_WIDTH)
 	{
 		y = -1;
-		while (++y < e->w_height)
+		while (++y < WIN_HEIGHT)
 		{
 			draw_point_to_img(e, x, y, e->buffer[y][x]);
 		}

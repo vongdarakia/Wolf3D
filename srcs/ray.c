@@ -55,7 +55,7 @@ void	set_wall_height(t_env *e)
 	else
 		e->wall_dist = (e->map.y - e->ray_pos.y
 			+ (1 - e->step.y) / 2) / e->ray_dir.y;
-	e->line_height = (int)(e->w_height / e->wall_dist);
+	e->line_height = (int)(WIN_HEIGHT / e->wall_dist);
 }
 
 void	set_texture_positions(t_env *e)
@@ -79,7 +79,7 @@ void	draw_texture(t_env *e)
 	e->y = e->draw_start;
 	while (e->y < e->draw_end)
 	{
-		e->d = e->y * 256 - e->w_height * 128 + e->line_height * 128;
+		e->d = e->y * 256 - WIN_HEIGHT * 128 + e->line_height * 128;
 		e->tex.y = ((e->d * e->tex_height) / e->line_height) / 256;
 		e->color = e->texture[e->tex_num][e->tex_height * e->tex.y + e->tex.x];
 		if (e->side == 1)
@@ -93,18 +93,18 @@ void	draw_texture(t_env *e)
 void	draw_rays(t_env *e)
 {
 	e->x = -1;
-	while (++(e->x) < e->w_width)
+	while (++(e->x) < WIN_WIDTH)
 	{
-		e->camera_x = 2 * e->x / (double)(e->w_width) - 1;
+		e->camera_x = 2 * e->x / (double)(WIN_WIDTH) - 1;
 		e->ray_dir.x = e->dir.x + e->plane.x * e->camera_x;
 		e->ray_dir.y = e->dir.y + e->plane.y * e->camera_x;
 		set_wall_height(e);
-		e->draw_start = -e->line_height / 2 + e->w_height / 2;
+		e->draw_start = -e->line_height / 2 + WIN_HEIGHT / 2;
 		if (e->draw_start < 0)
 			e->draw_start = 0;
-		e->draw_end = e->line_height / 2 + e->w_height / 2;
-		if (e->draw_end >= e->w_height)
-			e->draw_end = e->w_height - 1;
+		e->draw_end = e->line_height / 2 + WIN_HEIGHT / 2;
+		if (e->draw_end >= WIN_HEIGHT)
+			e->draw_end = WIN_HEIGHT - 1;
 		draw_texture(e);
 	}
 	mlx_put_image_to_window(e->mlx, e->win, e->img, 0, 0);

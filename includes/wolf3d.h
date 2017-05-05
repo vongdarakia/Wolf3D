@@ -111,8 +111,6 @@ typedef struct	s_env
 	int				line_size;
 	int				endian;
 
-	int				w_height;
-	int				w_width;
 	int				m_height;
 	int				m_width;
 	int				tex_height;
@@ -177,6 +175,7 @@ void			cast_ray(t_env *e);
 int				get_wall_height(t_env *e);
 
 int				loop_hook(t_env *e);
+int				close_hook(t_env *e);
 int				key_pressed(int keycode, t_env *e);
 int				key_released(int keycode, t_env *e);
 
@@ -185,4 +184,7 @@ void			move_straight(t_env *e, double speed);
 
 int				is_str_numeric(char *str);
 int				get_width(char **words);
+
+void			free_map(char **map);
+void			free_mapn(char **map, int num);
 #endif

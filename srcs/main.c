@@ -16,15 +16,16 @@ t_env	init_env(int ac, char **av)
 {
 	t_env env;
 
-	env.w_width = WIN_WIDTH;
-	env.w_height = WIN_HEIGHT;
 	if (ac > 1)
 		read_map(&env, av[1]);
 	else
-		read_map(&env, "map1.txt");
+	{
+		ft_printf("Error: Please input a map (ex. ./wolf3d map.txt)\n");
+		exit(0);
+	}
 	env.mlx = mlx_init();
-	env.win = mlx_new_window(env.mlx, env.w_width, env.w_height, "Wolf3D");
-	env.img = mlx_new_image(env.mlx, env.w_width, env.w_height);
+	env.win = mlx_new_window(env.mlx, WIN_WIDTH, WIN_HEIGHT, "Wolf3D");
+	env.img = mlx_new_image(env.mlx, WIN_WIDTH, WIN_HEIGHT);
 	env.img_ptr = mlx_get_data_addr((void *)env.img, &(env.bpp),
 		&(env.line_size), &(env.endian));
 	env.ray_pos = pos_f(22, 12);
@@ -34,7 +35,7 @@ t_env	init_env(int ac, char **av)
 	env.tex_width = 64;
 	env.tex_height = 64;
 	env.move_spd = 0.1;
-	env.rot_spd = M_PI * 2.0 / 180.0;
+	env.rot_spd = M_PI * 2.5 / 180.0;
 	ft_bzero(env.keys, NUM_KEYS);
 	return (env);
 }
@@ -84,6 +85,20 @@ void	set_textures(t_env *e)
 
 int		close_hook(t_env *e)
 {
+	int	i;
+
+	i = -1;
+	while (++i < WIN_HEIGHT)
+		free(e->buffer[i]);
+	free(e->buffer);
+	i = -1;
+	while (++i < 8)
+		free(e->texture[i]);
+	free(e->texture);
+	i = -1;
+	while (++i < e->m_height)
+		free(e->w_map[i]);
+	free(e->w_map);
 	exit(0);
 }
 

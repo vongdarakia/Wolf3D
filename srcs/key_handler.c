@@ -52,7 +52,7 @@ int		key_pressed(int keycode, t_env *e)
 {
 	e->keys[keycode] = 1;
 	if (keycode == KEY_ESC)
-		exit(0);
+		close_hook(e);
 	return (0);
 }
 
@@ -77,7 +77,7 @@ int		loop_hook(t_env *e)
 		|| e->keys[KEY_W] || e->keys[KEY_UP])
 	{
 		mlx_destroy_image(e->mlx, e->img);
-		e->img = mlx_new_image(e->mlx, e->w_width, e->w_height);
+		e->img = mlx_new_image(e->mlx, WIN_WIDTH, WIN_HEIGHT);
 		draw_rays(e);
 	}
 	return (0);

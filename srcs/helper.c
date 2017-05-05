@@ -32,3 +32,29 @@ int		get_width(char **words)
 		i++;
 	return (i);
 }
+
+void	free_map(char **map)
+{
+	int i;
+
+	i = 0;
+	while (map[i])
+	{
+		free(map[i]);
+		i++;
+	}
+	free(map);
+}
+
+void	free_mapn(char **map, int num)
+{
+	int i;
+
+	i = 0;
+	while (i < num)
+	{
+		free(map[i]);
+		i++;
+	}
+	free(map);
+}
