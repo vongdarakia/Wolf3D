@@ -26,6 +26,8 @@ t_env init_env(int ac, char **av)
 	// env.move_spd = 0;
 	env.move_spd = 0.1;
 	env.rot_spd = 0.05;
+	env.tex_width = 64;
+	env.tex_height = 64;
 	env.prev_time = clock();
 	ft_bzero(env.keys, NUM_KEYS);
 	return (env);

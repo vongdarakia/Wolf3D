@@ -12,19 +12,6 @@
 
 #include "wolf3d.h"
 
-int		get_color(t_env *e)
-{
-	return e->texture[];
-	if (e->w_map[e->map.x][e->map.y] == 1)
-	{
-		if (e->side == SIDE_Y)
-			return (e->ray_dir.y > 0 ? RED : BLUE);
-		else
-			return (e->ray_dir.x > 0 ? GREEN : YELLOW);
-	}
-	return (WHITE);
-}
-
 void	cast_ray(t_env *e)
 {
 	e->hit = 0;
@@ -47,16 +34,12 @@ void	cast_ray(t_env *e)
 	}
 }
 
-int		get_wall_height(t_env *e)
+void	set_wall_height(t_env *e)
 {
-	double	wall_dist;
-	double	y2;
-	double	x2;
-
-	y2 = e->ray_dir.y * e->ray_dir.y;
-	x2 = e->ray_dir.x * e->ray_dir.x;
-	e->dlt_dist.x = sqrt(1 + (y2) / (x2));
-	e->dlt_dist.y = sqrt(1 + (x2) / (y2));
+	e->y2 = e->ray_dir.y * e->ray_dir.y;
+	e->x2 = e->ray_dir.x * e->ray_dir.x;
+	e->dlt_dist.x = sqrt(1 + (e->y2) / (e->x2));
+	e->dlt_dist.y = sqrt(1 + (e->x2) / (e->y2));
 	e->map.x = (int)(e->ray_pos.x);
 	e->map.y = (int)(e->ray_pos.y);
 	e->step.x = (e->ray_dir.x < 0) ? -1 : 1;
@@ -67,47 +50,71 @@ int		get_wall_height(t_env *e)
 		* e->dlt_dist.y : (e->map.y + 1.0 - e->ray_pos.y) * e->dlt_dist.y;
 	cast_ray(e);
 	if (e->side == 0)
-		wall_dist = (e->map.x - e->ray_pos.x
+		e->wall_dist = (e->map.x - e->ray_pos.x
 			+ (1 - e->step.x) / 2) / e->ray_dir.x;
 	else
-		wall_dist = (e->map.y - e->ray_pos.y
+		e->wall_dist = (e->map.y - e->ray_pos.y
 			+ (1 - e->step.y) / 2) / e->ray_dir.y;
-	return (int)(e->w_height / wall_dist);
+	e->line_height = (int)(e->w_height / e->wall_dist);
 }
 
-void	draw_rays_with_fps(t_env *e)
+void	set_texture(t_env *e)
 {
-	// clock_t	start;
-	// clock_t	end;
-	// double	frame_time;
+	// e->tex_num = 0;
+	// if (e->w_map[e->map.x][e->map.y] > 0)
+	// {
+	// 	if (e->side == SIDE_Y)
+	// 		e->tex_num = (e->ray_dir.y > 0 ? 1 : 2);
+	// 	else
+	// 		e->tex_num = (e->ray_dir.x > 0 ? 3 : 4);
+	// }
+	e->tex_num = e->w_map[e->map.x][e->map.y] - 1;
+	if (e->side == 0)
+		e->wall_x = e->ray_pos.y + e->wall_dist * e->ray_dir.y;
+	else
+		e->wall_x = e->ray_pos.x + e->wall_dist * e->ray_dir.x;
+	e->wall_x -= floor(e->wall_x);
+	e->tex.x = (int)(e->wall_x * (double)(e->tex_width));
+	if(e->side == 0 && e->ray_dir.x > 0)
+		e->tex.x = e->tex_width - e->tex.x - 1;
+	if(e->side == 1 && e->ray_dir.y < 0)
+		e->tex.x = e->tex_width - e->tex.x - 1;
+}
 
-	// start = clock();
-	draw_rays(e);
-	
-	// printf("frame_time: %f\n", frame_time);
-	// e->move_spd = frame_time * 20.0;
-	// e->rot_spd = frame_time * 15.0;
+void	draw_texture(t_env *e)
+{
+	set_texture(e);
+	e->y = e->draw_start;
+	while (e->y < e->draw_end)
+	{
+		e->d = e->y * 256 - e->w_height * 128 + e->line_height * 128;
+		e->tex.y = ((e->d * e->tex_height) / e->line_height) / 256;
+		e->color = e->texture[e->tex_num][e->tex_height * e->tex.y + e->tex.x];
+		if(e->side == 1)
+			e->color = (e->color >> 1) & 8355711;
+		e->buffer[e->y][e->x] = e->color;
+		draw_point_to_img(e, e->x, e->y, e->color);
+		e->y++;
+	}
 }
 
 void	draw_rays(t_env *e)
 {
-	int	draw_start;
-	int	draw_end;
-	int	x;
-
-	x = -1;
-	while (++x < e->w_width)
+	e->x = -1;
+	while (++(e->x) < e->w_width)
 	{
-		e->cameraX = 2 * x / (double)(e->w_width) - 1;
+		e->cameraX = 2 * e->x / (double)(e->w_width) - 1;
 		e->ray_dir.x = e->dir.x + e->plane.x * e->cameraX;
 		e->ray_dir.y = e->dir.y + e->plane.y * e->cameraX;
-		e->line_height = get_wall_height(e);
-		draw_start = -e->line_height / 2 + e->w_height / 2;
-		if (draw_start < 0)
-			draw_start = 0;
-		draw_end = e->line_height / 2 + e->w_height / 2;
-		if (draw_end >= e->w_height)
-			draw_end = e->w_height - 1;
-		draw_line(e, point(x, draw_start), point(x, draw_end), get_color(e));
+		set_wall_height(e);
+		e->draw_start = -e->line_height / 2 + e->w_height / 2;
+		if (e->draw_start < 0)
+			e->draw_start = 0;
+		e->draw_end = e->line_height / 2 + e->w_height / 2;
+		if (e->draw_end >= e->w_height)
+			e->draw_end = e->w_height - 1;
+		draw_texture(e);
+		// draw_line(e, point(x, e->draw_start), point(x, e->draw_end), get_color(e));
 	}
+	mlx_put_image_to_window(e->mlx, e->win, e->img, 0, 0);
 }

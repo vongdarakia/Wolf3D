@@ -81,57 +81,6 @@
 # include "mlx.h"
 # include "get_next_line.h"
 
-typedef struct	s_keys
-{
-	int			a:1;
-	int			s:1;
-	int			d:1;
-	int			f:1;
-	int			h:1;
-	int			g:1;
-	int			z:1;
-	int			x:1;
-	int			c:1;
-	int			v:1;
-	int			b:1;
-	int			q:1;
-	int			w:1;
-	int			e:1;
-	int			r:1;
-	int			y:1;
-	int			t:1;
-	int			one:1;
-	int			two:1;
-	int			three:1;
-	int			four:1;
-	int			six:1;
-	int			five:1;
-	int			nine:1;
-	int			seven:1;
-	int			eight:1;
-	int			zero:1;
-	int			brace_r:1;
-	int			o:1;
-	int			u:1;
-	int			brace_l:1;
-	int			i:1;
-	int			p:1;
-	int			l:1;
-	int			j:1;
-	int			k:1;
-	int			semi:1;
-	int			n:1;
-	int			m:1;
-	int			tab:1;
-	int			plus:1;
-	int			minus:1;
-	int			left:1;
-	int			right:1;
-	int			down:1;
-	int			up:1;
-	int			esc:1;
-}				t_keys;
-
 typedef struct s_pos_i
 {
 	int x;
@@ -152,46 +101,62 @@ typedef struct	s_point
 
 typedef struct s_env
 {
-	t_point pos;
-	double dir_len;
+	
+	char			*img_ptr;
+	void			*img;
+	void			*mlx;
+	void			*win;
+	int				bpp;
+	int				line_size;
+	int				endian;
 
-	char *img_ptr;
-	void *img;
-	void *mlx;
-	void *win;
-	int bpp;
-	int line_size;
-	int endian;
 	int				w_height;
 	int				w_width;
 	int				m_height;
 	int				m_width;
 	int				tex_height;
 	int				tex_width;
-	t_pos_f		plane;
-	double		move_spd;
-	double		rot_spd;
-	double		cameraX;
-	t_pos_f		ray_pos;
-	t_pos_f		ray_dir;
-	t_pos_f		dir;
-	t_pos_i 	map;
-	t_pos_f side_dist;
-	t_pos_i step;
-	int			line_height;
-	int			side;
-	int			hit;
-	t_pos_f		dlt_dist;
-	unsigned int **buffer;
-	int **texture;
-	struct timeval startTime;
-	struct timeval endTime;
-	int color;
-	int **w_map;
-	int	keys[NUM_KEYS];
-	double	prev_time;
-	double	frame_time;
-	clock_t	end_time;
+	
+	double			move_spd;
+	double			rot_spd;
+	double			cameraX;
+
+	t_point			pos;
+	t_pos_f			ray_pos;
+	t_pos_f			ray_dir;
+	t_pos_f			plane;
+	t_pos_f			dir;
+	
+	t_pos_f			dlt_dist;
+	t_pos_f			side_dist;
+	t_pos_i			step;
+	t_pos_i			map;
+	int				line_height;
+	int				side;
+	int				hit;
+
+	t_pos_i			tex;
+	int				tex_num;
+	int				draw_start;
+	int				draw_end;
+	double			x2;
+	double			y2;
+	int				x;
+	int				y;
+	int				d;
+	double			wall_dist;
+	double			wall_x;
+	double			dir_len;
+	int				color;
+
+	double			prev_time;
+	double			frame_time;
+	clock_t			end_time;
+
+	unsigned int	**buffer;
+	int				**texture;
+	int				**w_map;
+	int				keys[NUM_KEYS];
 }			t_env;
 
 void	read_map(t_env *e, char *filename);
@@ -205,8 +170,8 @@ void	cast_ray(t_env *e);
 int		get_wall_height(t_env *e);
 
 t_point	point(int x, int y);
-int	loop_hook(t_env *e);
-int	key_pressed(int keycode, t_env *e);
+int		loop_hook(t_env *e);
+int		key_pressed(int keycode, t_env *e);
 int		key_released(int keycode, t_env *e);
 void	draw_minimap(t_env *e);
 void	draw_rays_with_fps(t_env *e);

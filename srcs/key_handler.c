@@ -73,8 +73,9 @@ int		loop_hook(t_env *e)
 	{
 		mlx_destroy_image(e->mlx, e->img);
 		e->img = mlx_new_image(e->mlx, e->w_width, e->w_height);
-		draw_rays_with_fps(e);
-		mlx_put_image_to_window(e->mlx, e->win, e->img, 0, 0);
+		// draw_rays_with_fps(e);
+		// draw_minimap(e);
+		draw_rays(e);
 	}
 	return (0);
 }

@@ -235,6 +235,7 @@ void	draw_minimap(t_env *e)
 
 	draw_map(e);
 	shoot_rays(e);
+	// printf("done\n");
 	// printf("map %.2f %.2f\n", e->pos.x, e->pos.y);
 	// printf("map %.2f / %d = %.2f == %d\n", e->pos.y, mapWidth, e->pos.y, e->map.y);
 	mlx_put_image_to_window(e->mlx, e->win, e->img, 0, 0);
