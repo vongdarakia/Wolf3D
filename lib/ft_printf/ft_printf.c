@@ -26,7 +26,7 @@ static void	init_env(t_env *e)
 	e->spec = 0;
 	e->num_out = 0;
 	e->base = 10;
-	e->is_specifier_lowercase = 1;
+	e->is_spec_lowercase = 1;
 }
 
 static void	clear_env(t_env *e)
@@ -42,7 +42,7 @@ static void	clear_env(t_env *e)
 	e->len_mod = "";
 	e->spec = 0;
 	e->base = 10;
-	e->is_specifier_lowercase = 1;
+	e->is_spec_lowercase = 1;
 }
 
 int			ft_printf(const char *str, ...)

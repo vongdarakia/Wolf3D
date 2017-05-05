@@ -37,7 +37,7 @@ static int	set_len_modifier(t_env *e, const char *str)
 static int	set_specifier(t_env *e, const char *str)
 {
 	e->spec = *str;
-	e->is_specifier_lowercase = (*str >= 'a' && *str <= 'z');
+	e->is_spec_lowercase = (*str >= 'a' && *str <= 'z');
 	if (*str == 'D' || *str == 'd' || *str == 'i')
 		e->base = 10;
 	else if (*str == 'o' || *str == 'O')

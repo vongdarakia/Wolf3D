@@ -57,7 +57,7 @@ static void	ft_print_num_u(uintmax_t num, t_env *e)
 	else if (e->flag_leading_zeroes && e->f_width > len && !e->flag_left_just)
 		ft_put_leading_zeroes(e->f_width - len);
 	if (ft_numlen_u(num, e->base, e) > 0)
-		ft_pfputnbr_u(num, e->base, e->is_specifier_lowercase);
+		ft_pfputnbr_u(num, e->base, e->is_spec_lowercase);
 }
 
 static int	len_with_precision(uintmax_t num, t_env *e)

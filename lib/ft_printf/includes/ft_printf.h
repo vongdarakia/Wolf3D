@@ -36,7 +36,7 @@ typedef struct	s_env {
 	int		prcsn_len;
 	char	*len_mod;
 	char	spec;
-	int		is_specifier_lowercase;
+	int		is_spec_lowercase;
 	int		base;
 }				t_env;
 

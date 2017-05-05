@@ -31,7 +31,7 @@ static void	ft_print_num(intmax_t num, t_env *e)
 			- (num < 0 || e->flag_signed || e->flag_space));
 	if (num != 0 || (num == 0 && !e->has_prcsn) || (e->has_prcsn
 		&& e->prcsn_len > 0 && (e->spec == 'i' || e->spec == 'u')))
-		ft_pfputnbr(num < 0 ? num * -1 : num, e->base, e->is_specifier_lowercase);
+		ft_pfputnbr(num < 0 ? num * -1 : num, e->base, e->is_spec_lowercase);
 }
 
 void		ft_print_num_signed(t_env *e, va_list *valist)
@@ -76,7 +76,7 @@ void		ft_print_num_array(t_env *e, va_list *valist)
 	while (++i < e->f_width)
 	{
 		len += ft_numlen(num[i], e->base);
-		ft_pfputnbr(num[i], e->base, e->is_specifier_lowercase);
+		ft_pfputnbr(num[i], e->base, e->is_spec_lowercase);
 		if (i < e->f_width - 1)
 			write(1, ", ", 2);
 	}
@@ -101,7 +101,7 @@ static void	ft_print_base(intmax_t num, t_env *e)
 		ft_put_leading_zeroes(e->prcsn_len - len);
 	if (num != 0 || (num == 0 && !e->has_prcsn) || (e->has_prcsn
 		&& e->prcsn_len > 0 && (e->spec == 'i' || e->spec == 'u')))
-		ft_pfputnbr(num < 0 ? num * -1 : num, e->base, e->is_specifier_lowercase);
+		ft_pfputnbr(num < 0 ? num * -1 : num, e->base, e->is_spec_lowercase);
 }
 
 void		ft_print_num_base(t_env *e, va_list *valist)

@@ -1,9 +1,21 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   wolf3d.h                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: avongdar <vongdarakia@gmail.com>           +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2017/05/04 19:24:28 by avongdar          #+#    #+#             */
+/*   Updated: 2017/05/04 19:24:29 by avongdar         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef WOLF3D_H
 # define WOLF3D_H
-# define mapWidth 20
-# define mapHeight 20
-# define screenWidth 640
-# define screenHeight 480
+# define MAP_WIDTH 64
+# define MAP_HEIGHT 64
+# define WIN_WIDTH 800
+# define WIN_HEIGHT 600
 # define SIDE_Y 1
 # define SIDE_X 0
 # define RED 0xFF0000
@@ -12,16 +24,7 @@
 # define WHITE 0xFFFFFF
 # define YELLOW 0xFFFF00
 # define ABS(x) ((x) < 0 ? -(x) : (x))
-# define W 13
-# define A 0
-# define S 1
-# define D 2
-# define UP 126
-# define LEFT 123
-# define DOWN 125
-# define RIGHT 124
 # define KEY_ESC 53
-
 # define KEY_A 0
 # define KEY_S 1
 # define KEY_D 2
@@ -71,7 +74,6 @@
 # define NUM_KEYS 512
 
 # include <stdlib.h>
-# include <stdio.h>
 # include <math.h>
 # include <time.h>
 # include <sys/time.h>
@@ -81,13 +83,13 @@
 # include "mlx.h"
 # include "get_next_line.h"
 
-typedef struct s_pos_i
+typedef struct	s_pos_i
 {
 	int x;
 	int y;
 }				t_pos_i;
 
-typedef struct s_pos_f
+typedef struct	s_pos_f
 {
 	double x;
 	double y;
@@ -99,9 +101,8 @@ typedef struct	s_point
 	double y;
 }				t_point;
 
-typedef struct s_env
+typedef struct	s_env
 {
-	
 	char			*img_ptr;
 	void			*img;
 	void			*mlx;
@@ -116,17 +117,17 @@ typedef struct s_env
 	int				m_width;
 	int				tex_height;
 	int				tex_width;
-	
+
 	double			move_spd;
 	double			rot_spd;
-	double			cameraX;
+	double			camera_x;
 
 	t_point			pos;
 	t_pos_f			ray_pos;
 	t_pos_f			ray_dir;
 	t_pos_f			plane;
 	t_pos_f			dir;
-	
+
 	t_pos_f			dlt_dist;
 	t_pos_f			side_dist;
 	t_pos_i			step;
@@ -157,22 +158,31 @@ typedef struct s_env
 	int				**texture;
 	int				**w_map;
 	int				keys[NUM_KEYS];
-}			t_env;
 
-void	read_map(t_env *e, char *filename);
-void	draw_point_to_img(t_env *e, int x, int y, int color);
-void	draw_line_xslope(t_env *e, t_point p0, t_point p1, int color);
-void	draw_line_yslope(t_env *e, t_point p0, t_point p1, int color);
-void	draw_line(t_env *e, t_point p0, t_point p1, int color);
-void	draw_buffer(t_env *e);
-void	draw_rays(t_env *e);
-void	cast_ray(t_env *e);
-int		get_wall_height(t_env *e);
+	t_pos_i			prev;
+}				t_env;
 
-t_point	point(int x, int y);
-int		loop_hook(t_env *e);
-int		key_pressed(int keycode, t_env *e);
-int		key_released(int keycode, t_env *e);
-void	draw_minimap(t_env *e);
-void	draw_rays_with_fps(t_env *e);
+t_point			point(int x, int y);
+t_pos_i			pos_i(int x, int y);
+t_pos_f			pos_f(double x, double y);
+
+void			read_map(t_env *e, char *filename);
+
+void			draw_point_to_img(t_env *e, int x, int y, int color);
+void			draw_line(t_env *e, t_point p0, t_point p1, int color);
+void			draw_buffer(t_env *e);
+void			draw_rays(t_env *e);
+
+void			cast_ray(t_env *e);
+int				get_wall_height(t_env *e);
+
+int				loop_hook(t_env *e);
+int				key_pressed(int keycode, t_env *e);
+int				key_released(int keycode, t_env *e);
+
+void			rotate(t_env *e, double rot_spd);
+void			move_straight(t_env *e, double speed);
+
+int				is_str_numeric(char *str);
+int				get_width(char **words);
 #endif

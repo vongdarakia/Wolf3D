@@ -58,7 +58,7 @@ void	set_wall_height(t_env *e)
 	e->line_height = (int)(e->w_height / e->wall_dist);
 }
 
-void	set_texture(t_env *e)
+void	set_texture_positions(t_env *e)
 {
 	e->tex_num = e->w_map[e->map.x][e->map.y] - 1;
 	if (e->side == 0)
@@ -75,7 +75,7 @@ void	set_texture(t_env *e)
 
 void	draw_texture(t_env *e)
 {
-	set_texture(e);
+	set_texture_positions(e);
 	e->y = e->draw_start;
 	while (e->y < e->draw_end)
 	{
@@ -95,9 +95,9 @@ void	draw_rays(t_env *e)
 	e->x = -1;
 	while (++(e->x) < e->w_width)
 	{
-		e->cameraX = 2 * e->x / (double)(e->w_width) - 1;
-		e->ray_dir.x = e->dir.x + e->plane.x * e->cameraX;
-		e->ray_dir.y = e->dir.y + e->plane.y * e->cameraX;
+		e->camera_x = 2 * e->x / (double)(e->w_width) - 1;
+		e->ray_dir.x = e->dir.x + e->plane.x * e->camera_x;
+		e->ray_dir.y = e->dir.y + e->plane.y * e->camera_x;
 		set_wall_height(e);
 		e->draw_start = -e->line_height / 2 + e->w_height / 2;
 		if (e->draw_start < 0)
